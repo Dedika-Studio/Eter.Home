@@ -1,4 +1,4 @@
-import { eq, inArray, and, lt, sql } from "drizzle-orm";
+import { eq, inArray, and, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, tickets, orders, type InsertOrder } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -179,6 +179,12 @@ export async function getOrdersByUserId(userId: number) {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(orders).where(eq(orders.userId, userId));
+}
+
+export async function getOrdersByPhone(phone: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(orders).where(eq(orders.buyerPhone, phone)).orderBy(desc(orders.createdAt));
 }
 
 export async function getAvailableRandomTickets(count: number): Promise<string[]> {

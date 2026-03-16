@@ -115,7 +115,7 @@ describe("checkout.create", () => {
     const result = await caller.checkout.create({
       ticketNumbers: ["000", "001"],
       buyerName: "Test User",
-      buyerPhone: "1234567890",
+      buyerPhone: "6571921509",
       buyerEmail: "test@example.com",
     });
     expect(result).toHaveProperty("checkoutUrl");
@@ -131,7 +131,7 @@ describe("checkout.create", () => {
       caller.checkout.create({
         ticketNumbers: ["002"],
         buyerName: "Test User",
-        buyerPhone: "1234567890",
+        buyerPhone: "6571921509",
       })
     ).rejects.toThrow("Boletos no disponibles");
   });

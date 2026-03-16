@@ -32,9 +32,12 @@ import {
   Sparkles,
   ShieldCheck,
   Clock,
+  Eye,
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function Home() {
+  const [, navigate] = useLocation();
   const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [autoCount, setAutoCount] = useState("");
@@ -181,6 +184,15 @@ export default function Home() {
             </span>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/check-tickets")}
+              className="gap-1 text-xs"
+            >
+              <Eye className="size-3" />
+              Revisa tus boletos
+            </Button>
             <Badge variant="secondary" className="text-xs font-medium gap-1">
               <ShieldCheck className="size-3" />
               Pago Seguro

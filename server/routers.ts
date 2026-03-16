@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { RAFFLE_CONFIG } from "@shared/raffle";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { ordersRouter } from "./routers/orders";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import Stripe from "stripe";
@@ -15,10 +16,13 @@ import {
   getOrderById,
   getAvailableRandomTickets,
   getDb,
+  getOrdersByPhone,
 } from "./db";
 import { RAFFLE_PRODUCT } from "./products";
 import { orders } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { formatPhoneMX, isValidPhoneMX } from "@shared/phone";
+import { sendWhatsAppConfirmation } from "./whatsapp";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2025-02-24.acacia" as any,
@@ -26,6 +30,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 export const appRouter = router({
   system: systemRouter,
+  orders: ordersRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -69,6 +74,14 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         await releaseExpiredReservations();
 
+        // Validate and format phone number
+        let formattedPhone: string;
+        try {
+          formattedPhone = formatPhoneMX(input.buyerPhone);
+        } catch (error) {
+          throw new Error("Número de teléfono inválido. Debe ser un número mexicano de 10 dígitos.");
+        }
+
         const ticketRows = await getTicketsByNumbers(input.ticketNumbers);
         const unavailable = ticketRows.filter(t => t.status !== "available");
         if (unavailable.length > 0) {
@@ -87,7 +100,7 @@ export const appRouter = router({
         const orderId = await createOrder({
           userId: ctx.user?.id ?? null,
           buyerName: input.buyerName,
-          buyerPhone: input.buyerPhone,
+          buyerPhone: formattedPhone,
           buyerEmail: input.buyerEmail ?? null,
           ticketNumbers: JSON.stringify(input.ticketNumbers),
           ticketCount: input.ticketNumbers.length,

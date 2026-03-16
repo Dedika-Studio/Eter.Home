@@ -7,6 +7,7 @@ import {
   releaseTicketsByOrder,
 } from "./db";
 import { syncToGoogleSheets } from "./sheets-sync";
+import { sendWhatsAppConfirmation } from "./whatsapp";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2025-02-24.acacia" as any,
@@ -83,6 +84,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Sync to Google Sheets
   const ticketNumbers = JSON.parse(order.ticketNumbers) as string[];
   await syncToGoogleSheets(order.id, ticketNumbers, order.buyerName, order.buyerPhone);
+
+  // Send WhatsApp confirmation
+  const whatsappPhone = `+52${order.buyerPhone}`;
+  await sendWhatsAppConfirmation({
+    to: whatsappPhone,
+    ticketNumbers,
+    buyerName: order.buyerName,
+    totalAmount: order.totalAmount,
+  });
 
   console.log(`[Webhook] Order ${order.id} completed. Tickets sold: ${ticketNumbers.join(", ")}`);
 }

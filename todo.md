@@ -19,3 +19,7 @@
 - [x] Vitest tests for backend procedures (7 tests passing)
 - [x] Final checkpoint and delivery
 - [x] Bug fix: "Boletos no disponibles" error - Added try/catch to release tickets if Stripe fails, cleaned up orphaned order
+- [x] Validación de formato de teléfono MX (10 dígitos)
+- [x] Notificaciones WhatsApp automáticas al confirmar pago
+- [x] Página "Revisa tus boletos" para consultar por teléfono
+- [x] Botón en header para acceder a "Revisa tus boletos"

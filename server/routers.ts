@@ -21,7 +21,7 @@ import {
 import { RAFFLE_PRODUCT } from "./products";
 import { orders } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
-import { formatPhoneMX, isValidPhoneMX } from "@shared/phone";
+
 import { sendWhatsAppConfirmation } from "./whatsapp";
 
 // Use LIVE keys if available, fallback to test keys
@@ -77,13 +77,8 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         await releaseExpiredReservations();
 
-        // Validate and format phone number
-        let formattedPhone: string;
-        try {
-          formattedPhone = formatPhoneMX(input.buyerPhone);
-        } catch (error) {
-          throw new Error("Número de teléfono inválido. Debe ser un número mexicano de 10 dígitos.");
-        }
+        // Use phone number as provided by user
+        const formattedPhone = input.buyerPhone.trim();
 
         const ticketRows = await getTicketsByNumbers(input.ticketNumbers);
         const unavailable = ticketRows.filter(t => t.status !== "available");

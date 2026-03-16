@@ -23,3 +23,5 @@
 - [x] Notificaciones WhatsApp automáticas al confirmar pago
 - [x] Página "Revisa tus boletos" para consultar por teléfono
 - [x] Botón en header para acceder a "Revisa tus boletos"
+- [x] Documentación de configuración para producción (README_CONFIGURACION.md)
+- [x] Estructura lista para desplegar (Stripe Live Mode, .env.example template)

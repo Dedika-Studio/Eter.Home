@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray, and, lt, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, tickets, orders, type InsertOrder } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,105 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ========== TICKET QUERIES ==========
+
+export async function getAllTickets() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({ number: tickets.number, status: tickets.status }).from(tickets);
+}
+
+export async function getTicketsByNumbers(numbers: string[]) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(tickets).where(inArray(tickets.number, numbers));
+}
+
+export async function reserveTickets(numbers: string[], orderId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const now = Date.now();
+  await db.update(tickets)
+    .set({ status: "reserved", orderId, reservedAt: now })
+    .where(and(inArray(tickets.number, numbers), eq(tickets.status, "available")));
+}
+
+export async function markTicketsSold(orderId: number, buyerName: string, buyerPhone: string, buyerEmail: string | null) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const now = Date.now();
+  await db.update(tickets)
+    .set({ status: "sold", buyerName, buyerPhone, buyerEmail, soldAt: now })
+    .where(eq(tickets.orderId, orderId));
+}
+
+export async function releaseExpiredReservations() {
+  const db = await getDb();
+  if (!db) return;
+  const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+  await db.update(tickets)
+    .set({ status: "available", orderId: null, reservedAt: null })
+    .where(and(eq(tickets.status, "reserved"), lt(tickets.reservedAt, tenMinutesAgo)));
+}
+
+export async function releaseTicketsByOrder(orderId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(tickets)
+    .set({ status: "available", orderId: null, reservedAt: null })
+    .where(and(eq(tickets.orderId, orderId), eq(tickets.status, "reserved")));
+}
+
+// ========== ORDER QUERIES ==========
+
+export async function createOrder(data: InsertOrder) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(orders).values(data);
+  return result[0].insertId;
+}
+
+export async function getOrderById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getOrderByStripeSession(sessionId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(orders).where(eq(orders.stripeSessionId, sessionId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateOrderStatus(id: number, status: "pending" | "paid" | "failed" | "expired", paymentIntentId?: string) {
+  const db = await getDb();
+  if (!db) return;
+  const updateData: Record<string, unknown> = { status };
+  if (paymentIntentId) updateData.stripePaymentIntentId = paymentIntentId;
+  await db.update(orders).set(updateData).where(eq(orders.id, id));
+}
+
+export async function markOrderSyncedToSheets(id: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(orders).set({ syncedToSheets: true }).where(eq(orders.id, id));
+}
+
+export async function getOrdersByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(orders).where(eq(orders.userId, userId));
+}
+
+export async function getAvailableRandomTickets(count: number): Promise<string[]> {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select({ number: tickets.number })
+    .from(tickets)
+    .where(eq(tickets.status, "available"))
+    .orderBy(sql`RAND()`)
+    .limit(count);
+  return result.map(r => r.number);
+}

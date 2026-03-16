@@ -150,14 +150,23 @@ export default function Home() {
       toast.error("Ingresa tu teléfono");
       return;
     }
-    if (selectedTickets.length === 0) {
-      toast.error("Selecciona al menos un boleto");
+    if (selectedTickets.length < 4) {
+      toast.error("El mínimo de compra es 4 boletos");
+      return;
+    }
+    if (selectedTickets.length > 30) {
+      toast.error("El máximo de compra es 30 boletos por pedido");
       return;
     }
     setShowConfirmDialog(true);
   }, [buyerName, buyerPhone, selectedTickets]);
 
   const confirmCheckout = useCallback(() => {
+    // Final validation before confirming
+    if (selectedTickets.length < 4 || selectedTickets.length > 30) {
+      toast.error("Debes seleccionar entre 4 y 30 boletos");
+      return;
+    }
     setShowConfirmDialog(false);
     setIsCheckingOut(true);
     createCheckout.mutate({
@@ -395,6 +404,12 @@ export default function Home() {
             )}
 
             <div className="border-t border-border/50 pt-4 mt-4">
+              {selectedTickets.length > 0 && selectedTickets.length < 4 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 text-sm text-amber-800">
+                  <p className="font-semibold mb-1">⚠️ Compra mínima: 4 boletos</p>
+                  <p className="text-xs">Necesitas seleccionar al menos 4 boletos para completar tu compra. Actualmente tienes {selectedTickets.length}.</p>
+                </div>
+              )}
               <div className="flex items-center justify-between mb-4">
                 <span className="text-sm text-muted-foreground">Total</span>
                 <span className="text-2xl font-extrabold bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
@@ -403,8 +418,8 @@ export default function Home() {
               </div>
               <Button
                 onClick={handleCheckout}
-                disabled={selectedTickets.length === 0 || isCheckingOut}
-                className="w-full h-12 text-base font-semibold shadow-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 hover:from-purple-700 hover:to-fuchsia-600 transition-all"
+                disabled={isCheckingOut || selectedTickets.length < 4 || selectedTickets.length > 30}
+                className="w-full h-12 text-base font-bold shadow-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 hover:from-purple-700 hover:to-fuchsia-600 transition-all"
               >
                 {isCheckingOut ? (
                   <>

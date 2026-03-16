@@ -25,3 +25,4 @@
 - [x] Botón en header para acceder a "Revisa tus boletos"
 - [x] Documentación de configuración para producción (README_CONFIGURACION.md)
 - [x] Estructura lista para desplegar (Stripe Live Mode, .env.example template)
+- [x] Bug fix: "Error al crear la sesión de pago" - Actualizado precio mínimo a $10 MXN (requisito de Stripe)

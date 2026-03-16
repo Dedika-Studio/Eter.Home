@@ -1,7 +1,7 @@
 export const RAFFLE_CONFIG = {
   name: "Rifa Album BTS - Skool Luv Affair",
-  pricePerTicket: 300, // 3 MXN in cents
-  priceDisplay: "$3 MXN",
+  pricePerTicket: 1000, // 10 MXN in cents (Stripe minimum: $10 MXN)
+  priceDisplay: "$10 MXN",
   currency: "mxn",
   totalTickets: 1000,
   maxTicketsPerOrder: 30,

@@ -9,7 +9,9 @@ import {
 import { syncToGoogleSheets } from "./sheets-sync";
 import { sendWhatsAppConfirmation } from "./whatsapp";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+// Use LIVE keys if available, fallback to test keys
+const stripeSecretKey = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || "";
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: "2025-02-24.acacia" as any,
 });
 
@@ -21,7 +23,7 @@ webhookRouter.post(
   raw({ type: "application/json" }),
   async (req, res) => {
     const sig = req.headers["stripe-signature"];
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+    const webhookSecret = process.env.STRIPE_LIVE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET || "";
 
     let event: Stripe.Event;
 

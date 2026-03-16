@@ -24,9 +24,12 @@ import { eq } from "drizzle-orm";
 import { formatPhoneMX, isValidPhoneMX } from "@shared/phone";
 import { sendWhatsAppConfirmation } from "./whatsapp";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+// Use LIVE keys if available, fallback to test keys
+const stripeSecretKey = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || "";
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: "2025-02-24.acacia" as any,
 });
+console.log(`[Stripe] Using ${stripeSecretKey.startsWith('sk_live_') ? 'LIVE' : 'TEST'} mode`);
 
 export const appRouter = router({
   system: systemRouter,

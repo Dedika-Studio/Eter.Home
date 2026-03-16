@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, number, status, orderId, reservedAt, UNIX_TIMESTAMP() * 1000 as now_ms FROM tickets WHERE status = 'reserved';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3NSmzhQk57F6Qqm.root --database eG7tCpxgJHL2beNG2g3VYE --execute SELECT id, number, status, orderId, reservedAt, UNIX_TIMESTAMP() * 1000 as now_ms FROM tickets WHERE status = 'reserved';",
+  "rows": [
+    {
+      "id": "5",
+      "number": "004",
+      "status": "reserved",
+      "orderId": "2",
+      "reservedAt": "1773639288516",
+      "now_ms": "1773639818000"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnumber\tstatus\torderId\treservedAt\tnow_ms\n5\t004\treserved\t2\t1773639288516\t1773639818000\n",
+  "stderr": "",
+  "execution_time_ms": 373
+}

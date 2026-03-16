@@ -10,6 +10,7 @@ import {
   getTicketsByNumbers,
   reserveTickets,
   releaseExpiredReservations,
+  releaseTicketsByOrder,
   createOrder,
   getOrderById,
   getAvailableRandomTickets,
@@ -97,7 +98,9 @@ export const appRouter = router({
         await reserveTickets(input.ticketNumbers, orderId);
 
         const origin = ctx.req.headers.origin || ctx.req.headers.referer || "";
-        const session = await stripe.checkout.sessions.create({
+        
+        try {
+          const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           line_items: [
             {
@@ -128,16 +131,22 @@ export const appRouter = router({
           allow_promotion_codes: true,
         });
 
-        const db = await getDb();
-        if (db) {
-          await db.update(orders).set({ stripeSessionId: session.id }).where(eq(orders.id, orderId));
-        }
+          const db = await getDb();
+          if (db) {
+            await db.update(orders).set({ stripeSessionId: session.id }).where(eq(orders.id, orderId));
+          }
 
-        return {
-          checkoutUrl: session.url,
-          sessionId: session.id,
-          orderId,
-        };
+          return {
+            checkoutUrl: session.url,
+            sessionId: session.id,
+            orderId,
+          };
+        } catch (stripeError) {
+          // If Stripe fails, release the reserved tickets immediately
+          console.error("[Checkout] Stripe session creation failed:", stripeError);
+          await releaseTicketsByOrder(orderId);
+          throw new Error("Error al crear la sesión de pago. Por favor, intenta de nuevo.");
+        }
       }),
 
     status: publicProcedure

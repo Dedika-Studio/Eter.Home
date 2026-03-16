@@ -1,0 +1,24 @@
+{
+  "query": "SELECT * FROM tickets WHERE number = '004';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3NSmzhQk57F6Qqm.root --database eG7tCpxgJHL2beNG2g3VYE --execute SELECT * FROM tickets WHERE number = '004';",
+  "rows": [
+    {
+      "id": "5",
+      "number": "004",
+      "status": "reserved",
+      "buyerName": "NULL",
+      "buyerPhone": "NULL",
+      "buyerEmail": "NULL",
+      "userId": "NULL",
+      "orderId": "2",
+      "reservedAt": "1773639288516",
+      "soldAt": "NULL",
+      "createdAt": "2026-03-16 05:21:34",
+      "updatedAt": "2026-03-16 05:34:48"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnumber\tstatus\tbuyerName\tbuyerPhone\tbuyerEmail\tuserId\torderId\treservedAt\tsoldAt\tcreatedAt\tupdatedAt\n5\t004\treserved\tNULL\tNULL\tNULL\tNULL\t2\t1773639288516\tNULL\t2026-03-16 05:21:34\t2026-03-16 05:34:48\n",
+  "stderr": "",
+  "execution_time_ms": 384
+}

@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE tickets SET status = 'available', orderId = NULL, reservedAt = NULL WHERE number = '004';\nUPDATE orders SET status = 'expired' WHERE id = 2 AND stripeSessionId IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3NSmzhQk57F6Qqm.root --database eG7tCpxgJHL2beNG2g3VYE --execute UPDATE tickets SET status = 'available', orderId = NULL, reservedAt = NULL WHERE number = '004';\nUPDATE orders SET status = 'expired' WHERE id = 2 AND stripeSessionId IS NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 498
+}

@@ -1,0 +1,34 @@
+{
+  "query": "SELECT id, number, status, orderId, reservedAt FROM tickets WHERE number = '004';\nSELECT COUNT(*) as reserved_count FROM tickets WHERE status = 'reserved';\nSELECT id, number, status, orderId, reservedAt FROM tickets WHERE status = 'reserved' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3NSmzhQk57F6Qqm.root --database eG7tCpxgJHL2beNG2g3VYE --execute SELECT id, number, status, orderId, reservedAt FROM tickets WHERE number = '004';\nSELECT COUNT(*) as reserved_count FROM tickets WHERE status = 'reserved';\nSELECT id, number, status, orderId, reservedAt FROM tickets WHERE status = 'reserved' LIMIT 10;",
+  "rows": [
+    {
+      "id": "5",
+      "number": "004",
+      "status": "reserved",
+      "orderId": "2",
+      "reservedAt": "1773639288516"
+    },
+    {
+      "id": "id",
+      "number": "number",
+      "status": "status",
+      "orderId": "orderId",
+      "reservedAt": "reservedAt"
+    },
+    {
+      "id": "5",
+      "number": "004",
+      "status": "reserved",
+      "orderId": "2",
+      "reservedAt": "1773639288516"
+    }
+  ],
+  "messages": [
+    "reserved_count",
+    "1"
+  ],
+  "stdout": "id\tnumber\tstatus\torderId\treservedAt\n5\t004\treserved\t2\t1773639288516\nreserved_count\n1\nid\tnumber\tstatus\torderId\treservedAt\n5\t004\treserved\t2\t1773639288516\n",
+  "stderr": "",
+  "execution_time_ms": 486
+}

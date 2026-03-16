@@ -18,3 +18,4 @@
 - [x] Footer with legal info and raffle terms
 - [x] Vitest tests for backend procedures (7 tests passing)
 - [x] Final checkpoint and delivery
+- [x] Bug fix: "Boletos no disponibles" error - Added try/catch to release tickets if Stripe fails, cleaned up orphaned order

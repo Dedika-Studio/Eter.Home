@@ -28,3 +28,4 @@
 - [x] Bug fix: "Error al crear la sesión de pago" - Actualizado precio mínimo a $10 MXN (requisito de Stripe)
 - [x] Feature: Validación de compra mínima de 4 boletos con aviso claro
 - [x] Configurar Stripe en modo LIVE (producción) - Conectado a cuenta acct_1TBTa79QDrRw4dR0 (Dedika Studio)
+- [x] Validación de teléfono: Restricción a exactamente 10 dígitos (maxLength/minLength) + validación en checkout

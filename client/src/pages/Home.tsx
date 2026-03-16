@@ -150,6 +150,10 @@ export default function Home() {
       toast.error("Ingresa tu teléfono");
       return;
     }
+    if (buyerPhone.length !== 10) {
+      toast.error("El teléfono debe tener exactamente 10 dígitos");
+      return;
+    }
     if (selectedTickets.length < 4) {
       toast.error("El mínimo de compra es 4 boletos");
       return;
@@ -291,10 +295,18 @@ export default function Home() {
               className="bg-white/80 backdrop-blur-sm border-border/50 focus:border-primary transition-all"
             />
             <Input
-              placeholder="Tu teléfono"
+              placeholder="Tu teléfono (10 dígitos)"
               type="tel"
+              inputMode="numeric"
               value={buyerPhone}
-              onChange={(e) => setBuyerPhone(e.target.value)}
+              onChange={(e) => {
+                const cleaned = e.target.value.replace(/\D/g, "");
+                if (cleaned.length <= 10) {
+                  setBuyerPhone(cleaned);
+                }
+              }}
+              maxLength={10}
+              minLength={10}
               className="bg-white/80 backdrop-blur-sm border-border/50 focus:border-primary transition-all"
             />
             <Input

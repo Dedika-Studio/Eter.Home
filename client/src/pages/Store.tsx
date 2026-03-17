@@ -123,14 +123,14 @@ export default function Store() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 md:gap-4 lg:gap-6">
             {products.map((product) => (
               <Card
                 key={product.id}
                 className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-all hover:scale-105"
               >
                 <CardContent className="p-0">
-                  <div className="relative h-48 bg-gradient-to-br from-purple-100 to-pink-100 overflow-hidden">
+                  <div className="relative h-32 md:h-48 bg-gradient-to-br from-purple-100 to-pink-100 overflow-hidden">
                     <img
                       src={product.image}
                       alt={product.title}
@@ -142,23 +142,23 @@ export default function Store() {
                       </Badge>
                     )}
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-sm mb-2 line-clamp-2">
+                  <div className="p-2 md:p-4">
+                    <h3 className="font-bold text-xs md:text-sm mb-1 md:mb-2 line-clamp-2">
                       {product.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground mb-3 line-clamp-3">
+                    <p className="text-xs text-muted-foreground mb-2 md:mb-3 line-clamp-2 md:line-clamp-3 hidden md:block">
                       {product.description}
                     </p>
-                    <div className="flex items-center gap-1 mb-3">
-                      <span className="text-yellow-500 text-sm">
+                    <div className="flex items-center gap-1 mb-2 md:mb-3 hidden md:flex">
+                      <span className="text-yellow-500 text-xs md:text-sm">
                         {renderStars(product.rating)}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground hidden md:inline">
                         ({product.rating} • {product.reviews} calificaciones)
                       </span>
                     </div>
-                    <div className="mb-4">
-                      <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
+                    <div className="mb-2 md:mb-4">
+                      <div className="text-lg md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
                         ${product.price} MXN
                       </div>
                     </div>
@@ -167,9 +167,10 @@ export default function Store() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Button className="w-full gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-                        <ExternalLink className="size-4" />
-                        Ver en Mercado Libre
+                      <Button className="w-full gap-1 md:gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-xs md:text-sm py-1 md:py-2">
+                        <ExternalLink className="size-3 md:size-4" />
+                        <span className="hidden md:inline">Ver en Mercado Libre</span>
+                        <span className="md:hidden">Ver</span>
                       </Button>
                     </a>
                   </div>

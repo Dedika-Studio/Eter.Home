@@ -50,3 +50,5 @@
 - [x] Integrar productos con base de datos (local state)
 - [x] Conectar Tienda al Landing Home
 - [x] Ajustar grid de productos a 3 columnas en móvil
+- [x] Cambiar Store a 2 columnas en móvil con productos más compactos
+- [x] Ajustar Landing Home a 2 secciones por línea en móvil

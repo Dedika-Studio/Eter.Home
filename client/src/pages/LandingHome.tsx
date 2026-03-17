@@ -85,7 +85,7 @@ export default function LandingHome() {
 
       {/* Main Content */}
       <section className="container py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
           {/* Rifas Section */}
           <Card className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">

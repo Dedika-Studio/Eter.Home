@@ -44,3 +44,8 @@
 - [x] Remover apartado de cantidad de boletos disponibles y totales en página de rifa - solo mostrar precio
 - [x] Reemplazar imagen de Tienda con versión actualizada
 - [x] Remover cantidad de boletos (1000 Boletos) de la sección Rifa Destacada en Landing Home
+- [x] Crear página de Tienda en React con glassmorphism
+- [x] Crear panel Admin protegido con contraseña "panochonas12"
+- [x] Botón discreto en footer para acceder a Admin
+- [x] Integrar productos con base de datos (local state)
+- [x] Conectar Tienda al Landing Home

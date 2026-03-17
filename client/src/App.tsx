@@ -9,6 +9,8 @@ import LandingHome from "./pages/LandingHome";
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
 import CheckTickets from "./pages/CheckTickets";
+import Store from "./pages/Store";
+import Admin from "./pages/Admin";
 
 function Router() {
   // Routing: / = Landing Home, /rifa = Raffle
@@ -20,6 +22,8 @@ function Router() {
       <Route path="/success" component={Success} />
       <Route path="/cancel" component={Cancel} />
       <Route path="/check-tickets" component={CheckTickets} />
+      <Route path="/tienda" component={Store} />
+      <Route path="/admin" component={Admin} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

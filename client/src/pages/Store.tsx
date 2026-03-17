@@ -1,0 +1,234 @@
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ExternalLink, ShoppingBag, Lock } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  image: string;
+  link: string;
+  rating: number;
+  reviews: number;
+  badge?: string;
+}
+
+export default function Store() {
+  const [, navigate] = useLocation();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [showAdminPrompt, setShowAdminPrompt] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [isAdminAuthorized, setIsAdminAuthorized] = useState(false);
+
+  // Fetch products from server
+  // TODO: Create store router
+  const productsData: Product[] = [];
+
+  useEffect(() => {
+    if (productsData) {
+      setProducts(productsData);
+    }
+  }, [productsData]);
+
+  const handleAdminAccess = () => {
+    if (adminPassword === "panochonas12") {
+      setIsAdminAuthorized(true);
+      setShowAdminPrompt(false);
+      setAdminPassword("");
+      navigate("/admin");
+    } else {
+      alert("Contraseña incorrecta");
+      setAdminPassword("");
+    }
+  };
+
+  const renderStars = (rating: number) => {
+    let stars = "";
+    for (let i = 0; i < 5; i++) {
+      if (rating >= i + 1) stars += "★";
+      else if (rating >= i + 0.5) stars += "☆";
+      else stars += "☆";
+    }
+    return stars;
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-border/50 shadow-sm">
+        <div className="container flex items-center justify-between h-14">
+          <div className="flex items-center gap-3">
+            <ShoppingBag className="size-6 text-purple-600" />
+            <span className="font-bold text-sm tracking-tight">Tienda</span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/")}
+            className="gap-1 text-xs"
+          >
+            ← Volver
+          </Button>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-12">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-500" />
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 25% 25%, white 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+        <div className="relative container text-center text-white py-8">
+          <h1 className="text-4xl font-bold mb-3">Tienda Oficial</h1>
+          <p className="text-lg text-white/90">
+            Productos exclusivos K-POP de tus artistas favoritos
+          </p>
+        </div>
+      </section>
+
+      {/* Products Grid */}
+      <section className="container py-12">
+        {products.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground mb-4">
+              No hay productos disponibles en este momento
+            </p>
+            <Button onClick={() => navigate("/")} variant="outline">
+              Volver al inicio
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((product) => (
+              <Card
+                key={product.id}
+                className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-all hover:scale-105"
+              >
+                <CardContent className="p-0">
+                  <div className="relative h-48 bg-gradient-to-br from-purple-100 to-pink-100 overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="w-full h-full object-cover"
+                    />
+                    {product.badge && (
+                      <Badge className="absolute top-3 right-3 bg-red-500">
+                        {product.badge}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-sm mb-2 line-clamp-2">
+                      {product.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mb-3 line-clamp-3">
+                      {product.description}
+                    </p>
+                    <div className="flex items-center gap-1 mb-3">
+                      <span className="text-yellow-500 text-sm">
+                        {renderStars(product.rating)}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        ({product.rating} • {product.reviews} calificaciones)
+                      </span>
+                    </div>
+                    <div className="mb-4">
+                      <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
+                        ${product.price} MXN
+                      </div>
+                    </div>
+                    <a
+                      href={product.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button className="w-full gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                        <ExternalLink className="size-4" />
+                        Ver en Mercado Libre
+                      </Button>
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Footer with Admin Button */}
+      <footer className="bg-muted/50 backdrop-blur-sm border-t border-border/50 mt-10">
+        <div className="container py-10 text-center">
+          <p className="text-sm font-medium text-foreground mb-4">
+            © 2026 DEDIKA STUDIO
+          </p>
+          <p className="text-xs text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-6">
+            Este sitio muestra productos disponibles en Mercado Libre mediante
+            enlaces externos. No vendemos ni distribuimos directamente los
+            productos mostrados. Las compras, envíos, garantías y políticas son
+            responsabilidad exclusiva de los vendedores y de la plataforma
+            Mercado Libre.
+          </p>
+
+          {/* Admin Access Button - Tiny and Discreet */}
+          <button
+            onClick={() => setShowAdminPrompt(true)}
+            className="text-xs text-muted-foreground/50 hover:text-muted-foreground/80 transition-colors flex items-center gap-1 mx-auto"
+          >
+            <Lock className="size-3" />
+            admin
+          </button>
+        </div>
+
+        {/* Admin Password Modal */}
+        {showAdminPrompt && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <Card className="w-96 bg-white/95 backdrop-blur-xl border-border/50">
+              <CardContent className="p-6">
+                <h2 className="text-lg font-bold mb-4">Acceso Admin</h2>
+                <input
+                  type="password"
+                  placeholder="Contraseña"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleAdminAccess();
+                  }}
+                  className="w-full px-3 py-2 border border-border rounded-lg mb-4 bg-background"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleAdminAccess}
+                    className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  >
+                    Entrar
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowAdminPrompt(false);
+                      setAdminPassword("");
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </footer>
+    </div>
+  );
+}

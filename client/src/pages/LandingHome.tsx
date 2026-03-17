@@ -139,12 +139,11 @@ export default function LandingHome() {
                   figuras, merchandise y mucho más. Envíos a todo México.
                 </p>
                 <Button
-                  disabled
-                  className="w-full gap-2 opacity-60"
-                  variant="outline"
+                  onClick={() => navigate("/tienda")}
+                  className="w-full gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
                 >
-                  <Clock className="size-4" />
-                  Próximamente
+                  <Store className="size-4" />
+                  Ver Tienda
                 </Button>
               </div>
             </CardContent>

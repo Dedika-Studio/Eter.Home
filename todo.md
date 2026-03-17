@@ -49,3 +49,4 @@
 - [x] Botón discreto en footer para acceder a Admin
 - [x] Integrar productos con base de datos (local state)
 - [x] Conectar Tienda al Landing Home
+- [x] Ajustar grid de productos a 3 columnas en móvil

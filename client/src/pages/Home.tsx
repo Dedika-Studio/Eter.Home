@@ -233,18 +233,8 @@ export default function Home() {
           </p>
           <div className="flex items-center justify-center gap-6 mt-8">
             <div className="text-center">
-              <div className="text-2xl font-extrabold">{availableCount}</div>
-              <div className="text-xs text-white/70 font-medium">Disponibles</div>
-            </div>
-            <div className="w-px h-10 bg-white/20" />
-            <div className="text-center">
               <div className="text-2xl font-extrabold">{RAFFLE_CONFIG.priceDisplay}</div>
               <div className="text-xs text-white/70 font-medium">Por boleto</div>
-            </div>
-            <div className="w-px h-10 bg-white/20" />
-            <div className="text-center">
-              <div className="text-2xl font-extrabold">1000</div>
-              <div className="text-xs text-white/70 font-medium">Boletos</div>
             </div>
           </div>
         </div>

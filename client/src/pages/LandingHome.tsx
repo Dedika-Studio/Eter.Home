@@ -247,11 +247,7 @@ export default function LandingHome() {
                   artículo.
                 </p>
 
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="bg-white/60 backdrop-blur rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-purple-600">1000</div>
-                    <div className="text-xs text-gray-600">Boletos</div>
-                  </div>
+                <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-white/60 backdrop-blur rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-purple-600">
                       {RAFFLE_CONFIG.priceDisplay}

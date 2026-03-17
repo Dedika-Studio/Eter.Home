@@ -123,7 +123,7 @@ export default function LandingHome() {
             <CardContent className="p-0">
               <div className="relative h-48 bg-gradient-to-br from-blue-400 to-cyan-400 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=600&fit=crop"
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663442540562/eG7tCpxgJHL2beNG2g3VYE/TIENDAOFICIAL_17857fef.png"
                   alt="K-POP Merchandise"
                   className="w-full h-full object-cover"
                 />
@@ -155,7 +155,7 @@ export default function LandingHome() {
             <CardContent className="p-0">
               <div className="relative h-48 bg-gradient-to-br from-orange-400 to-red-400 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop"
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663442540562/eG7tCpxgJHL2beNG2g3VYE/GALERIAS_fd059a61.png"
                   alt="BTS Concert Performance"
                   className="w-full h-full object-cover"
                 />
@@ -187,7 +187,7 @@ export default function LandingHome() {
             <CardContent className="p-0">
               <div className="relative h-48 bg-gradient-to-br from-green-400 to-emerald-400 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop"
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663442540562/eG7tCpxgJHL2beNG2g3VYE/BIOGRAFIAS_d6416b1b.png"
                   alt="BLACKPINK Members"
                   className="w-full h-full object-cover"
                 />

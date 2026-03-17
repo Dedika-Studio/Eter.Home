@@ -123,8 +123,8 @@ export default function LandingHome() {
             <CardContent className="p-0">
               <div className="relative h-48 bg-gradient-to-br from-blue-400 to-cyan-400 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=800&h=600&fit=crop"
-                  alt="K-POP Store"
+                  src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=600&fit=crop"
+                  alt="K-POP Merchandise"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
@@ -155,8 +155,8 @@ export default function LandingHome() {
             <CardContent className="p-0">
               <div className="relative h-48 bg-gradient-to-br from-orange-400 to-red-400 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop"
-                  alt="K-POP Gallery"
+                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop"
+                  alt="BTS Concert Performance"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
@@ -187,8 +187,8 @@ export default function LandingHome() {
             <CardContent className="p-0">
               <div className="relative h-48 bg-gradient-to-br from-green-400 to-emerald-400 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop"
-                  alt="BTS Members"
+                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop"
+                  alt="BLACKPINK Members"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />

@@ -89,17 +89,13 @@ export default function LandingHome() {
           {/* Rifas Section */}
           <Card className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
-              <div className="relative h-48 bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 opacity-20">
-                  <div
-                    style={{
-                      backgroundImage:
-                        "radial-gradient(circle at 20% 50%, white 1px, transparent 1px)",
-                      backgroundSize: "20px 20px",
-                    }}
-                  />
-                </div>
-                <Ticket className="size-24 text-white/80" />
+              <div className="relative h-48 bg-gradient-to-br from-purple-400 to-pink-400 overflow-hidden">
+                <img
+                  src="https://http2.mlstatic.com/D_NQ_NP_2X_867895-MLA99578718932_122025-F.webp"
+                  alt="Rifa BTS Album"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
               <div className="p-6">
                 <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
@@ -125,17 +121,13 @@ export default function LandingHome() {
           {/* Tienda Section */}
           <Card className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
-              <div className="relative h-48 bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 opacity-20">
-                  <div
-                    style={{
-                      backgroundImage:
-                        "radial-gradient(circle at 20% 50%, white 1px, transparent 1px)",
-                      backgroundSize: "20px 20px",
-                    }}
-                  />
-                </div>
-                <Store className="size-24 text-white/80" />
+              <div className="relative h-48 bg-gradient-to-br from-blue-400 to-cyan-400 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=800&h=600&fit=crop"
+                  alt="K-POP Store"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
               <div className="p-6">
                 <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
@@ -161,17 +153,13 @@ export default function LandingHome() {
           {/* Galerías Section */}
           <Card className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
-              <div className="relative h-48 bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 opacity-20">
-                  <div
-                    style={{
-                      backgroundImage:
-                        "radial-gradient(circle at 20% 50%, white 1px, transparent 1px)",
-                      backgroundSize: "20px 20px",
-                    }}
-                  />
-                </div>
-                <Images className="size-24 text-white/80" />
+              <div className="relative h-48 bg-gradient-to-br from-orange-400 to-red-400 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop"
+                  alt="K-POP Gallery"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
               <div className="p-6">
                 <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
@@ -197,17 +185,13 @@ export default function LandingHome() {
           {/* Biografías Section */}
           <Card className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
-              <div className="relative h-48 bg-gradient-to-br from-green-400 to-emerald-400 flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 opacity-20">
-                  <div
-                    style={{
-                      backgroundImage:
-                        "radial-gradient(circle at 20% 50%, white 1px, transparent 1px)",
-                      backgroundSize: "20px 20px",
-                    }}
-                  />
-                </div>
-                <Users className="size-24 text-white/80" />
+              <div className="relative h-48 bg-gradient-to-br from-green-400 to-emerald-400 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop"
+                  alt="BTS Members"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
               <div className="p-6">
                 <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
@@ -246,7 +230,7 @@ export default function LandingHome() {
                 <img
                   src="https://http2.mlstatic.com/D_NQ_NP_2X_867895-MLA99578718932_122025-F.webp"
                   alt={RAFFLE_CONFIG.name}
-                  className="w-full rounded-xl shadow-lg"
+                  className="w-full rounded-xl shadow-lg hover:shadow-2xl transition-shadow"
                 />
               </div>
               <div>
@@ -294,8 +278,32 @@ export default function LandingHome() {
         </Card>
       </section>
 
+      {/* Stats Section */}
+      <section className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12 mt-12">
+        <div className="container">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold mb-2">1000+</div>
+              <div className="text-sm text-white/80">Boletos Disponibles</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">$3 MXN</div>
+              <div className="text-sm text-white/80">Por Boleto</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">100%</div>
+              <div className="text-sm text-white/80">Seguro</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">31 Mar</div>
+              <div className="text-sm text-white/80">Sorteo</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-16">
+      <footer className="bg-gray-900 text-white">
         <div className="container py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>

@@ -35,3 +35,5 @@
 - [x] Placeholders "Próximamente" para otras secciones
 - [x] Aplicar estilo glassmorphism consistente con la rifa actual
 - [x] Responsive design en todas las secciones
+- [x] Integrar imágenes de alta resolución en cada sección
+- [x] Agregar sección de estadísticas con números clave

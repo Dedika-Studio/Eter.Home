@@ -40,3 +40,4 @@
 - [x] Integrar imágenes personalizadas de Canva: Tienda, Galerías, Biografías
 - [x] Remover apartado de estadísticas morado
 - [x] Reducir espaciado entre secciones y Rifa Destacada para móvil
+- [x] Ajustar posición de imágenes (object-top) para enfocar parte superior y no cortar rostros

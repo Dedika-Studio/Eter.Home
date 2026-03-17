@@ -52,44 +52,47 @@ export default function LandingHome() {
             backgroundSize: "24px 24px",
           }}
         />
-        <div className="relative container py-16 text-center text-white">
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md rounded-full px-4 py-1.5 mb-6 text-sm font-medium">
-            <Sparkles className="size-4" />
-            Bienvenido a ETER KPOP MX
+        <div className="relative container py-8 md:py-16 text-center text-white">
+          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md rounded-full px-3 py-1 mb-3 md:mb-6 text-xs md:text-sm font-medium">
+            <Sparkles className="size-3 md:size-4" />
+            <span className="hidden md:inline">Bienvenido a ETER KPOP MX</span>
+            <span className="md:hidden">ETER KPOP MX</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 drop-shadow-lg">
+          <h1 className="text-2xl md:text-5xl font-extrabold tracking-tight mb-2 md:mb-4 drop-shadow-lg">
             Descubre el Mundo K-POP
           </h1>
-          <p className="text-white/90 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Productos exclusivos, rifas emocionantes y contenido de tus artistas
-            favoritos. Todo en un solo lugar.
+          <p className="text-white/90 text-xs md:text-lg max-w-2xl mx-auto leading-relaxed">
+            <span className="hidden md:inline">Productos exclusivos, rifas emocionantes y contenido de tus artistas favoritos. Todo en un solo lugar.</span>
+            <span className="md:hidden">Rifas, productos y contenido K-POP</span>
           </p>
-          <div className="flex flex-wrap justify-center gap-3 mt-8">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mt-4 md:mt-8">
             <Button
               onClick={() => navigate("/rifa")}
-              className="gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
+              className="gap-1 md:gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-xs md:text-sm py-1 md:py-2"
             >
-              <Ticket className="size-4" />
-              Ir a Rifas
+              <Ticket className="size-3 md:size-4" />
+              <span className="hidden md:inline">Ir a Rifas</span>
+              <span className="md:hidden">Rifas</span>
             </Button>
             <Button
               variant="outline"
-              className="gap-2 bg-white/20 border-white/40 text-white hover:bg-white/30"
+              className="gap-1 md:gap-2 bg-white/20 border-white/40 text-white hover:bg-white/30 text-xs md:text-sm py-1 md:py-2"
             >
-              <Store className="size-4" />
-              Explorar
+              <Store className="size-3 md:size-4" />
+              <span className="hidden md:inline">Explorar</span>
+              <span className="md:hidden">Tienda</span>
             </Button>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="container py-16">
+      <section className="container py-8 md:py-16">
         <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
           {/* Rifas Section */}
           <Card className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
-              <div className="relative h-48 bg-gradient-to-br from-purple-400 to-pink-400 overflow-hidden">
+              <div className="relative h-32 md:h-48 bg-gradient-to-br from-purple-400 to-pink-400 overflow-hidden">
                 <img
                   src="https://http2.mlstatic.com/D_NQ_NP_2X_867895-MLA99578718932_122025-F.webp"
                   alt="Rifa BTS Album"
@@ -97,22 +100,24 @@ export default function LandingHome() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
-              <div className="p-6">
-                <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                  <Sparkles className="size-5 text-purple-600" />
-                  Rifas
+              <div className="p-2 md:p-6">
+                <h2 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 flex items-center gap-2">
+                  <Sparkles className="size-4 md:size-5 text-purple-600" />
+                  <span className="hidden md:inline">Rifas</span>
+                  <span className="md:hidden">Rifas</span>
                 </h2>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 text-xs md:text-sm mb-2 md:mb-4 hidden md:block">
                   Participa en nuestras rifas exclusivas y gana productos
                   increíbles del mundo K-POP. ¡Tu oportunidad de ganar está
                   aquí!
                 </p>
                 <Button
                   onClick={() => navigate("/rifa")}
-                  className="w-full gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  className="w-full gap-1 md:gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-xs md:text-sm py-1 md:py-2"
                 >
-                  Ver Rifas Activas
-                  <ArrowRight className="size-4" />
+                  <span className="hidden md:inline">Ver Rifas Activas</span>
+                  <span className="md:hidden">Rifas</span>
+                  <ArrowRight className="size-3 md:size-4" />
                 </Button>
               </div>
             </CardContent>
@@ -121,7 +126,7 @@ export default function LandingHome() {
           {/* Tienda Section */}
           <Card className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
-              <div className="relative h-48 bg-gradient-to-br from-blue-400 to-cyan-400 overflow-hidden">
+              <div className="relative h-32 md:h-48 bg-gradient-to-br from-blue-400 to-cyan-400 overflow-hidden">
                 <img
                   src="https://d2xsxph8kpxj0f.cloudfront.net/310519663442540562/eG7tCpxgJHL2beNG2g3VYE/TIENDA_a3fdf310.png"
                   alt="K-POP Merchandise"
@@ -129,21 +134,22 @@ export default function LandingHome() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
-              <div className="p-6">
-                <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                  <Store className="size-5 text-blue-600" />
+              <div className="p-2 md:p-6">
+                <h2 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 flex items-center gap-2">
+                  <Store className="size-4 md:size-5 text-blue-600" />
                   Tienda
                 </h2>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 text-xs md:text-sm mb-2 md:mb-4 hidden md:block">
                   Explora nuestra colección de productos K-POP: álbumes,
                   figuras, merchandise y mucho más. Envíos a todo México.
                 </p>
                 <Button
                   onClick={() => navigate("/tienda")}
-                  className="w-full gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+                  className="w-full gap-1 md:gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-xs md:text-sm py-1 md:py-2"
                 >
-                  <Store className="size-4" />
-                  Ver Tienda
+                  <Store className="size-3 md:size-4" />
+                  <span className="hidden md:inline">Ver Tienda</span>
+                  <span className="md:hidden">Tienda</span>
                 </Button>
               </div>
             </CardContent>
@@ -152,7 +158,7 @@ export default function LandingHome() {
           {/* Galerías Section */}
           <Card className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
-              <div className="relative h-48 bg-gradient-to-br from-orange-400 to-red-400 overflow-hidden">
+              <div className="relative h-32 md:h-48 bg-gradient-to-br from-orange-400 to-red-400 overflow-hidden">
                 <img
                   src="https://d2xsxph8kpxj0f.cloudfront.net/310519663442540562/eG7tCpxgJHL2beNG2g3VYE/GALERIAS_fd059a61.png"
                   alt="BTS Concert Performance"
@@ -160,12 +166,12 @@ export default function LandingHome() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
-              <div className="p-6">
-                <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                  <Images className="size-5 text-orange-600" />
+              <div className="p-2 md:p-6">
+                <h2 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 flex items-center gap-2">
+                  <Images className="size-4 md:size-5 text-orange-600" />
                   Galerías
                 </h2>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 text-xs md:text-sm mb-2 md:mb-4 hidden md:block">
                   Galería de fotos de eventos, conciertos y momentos especiales
                   del mundo K-POP. Revive tus momentos favoritos.
                 </p>
@@ -184,7 +190,7 @@ export default function LandingHome() {
           {/* Biografías Section */}
           <Card className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
-              <div className="relative h-48 bg-gradient-to-br from-green-400 to-emerald-400 overflow-hidden">
+              <div className="relative h-32 md:h-48 bg-gradient-to-br from-green-400 to-emerald-400 overflow-hidden">
                 <img
                   src="https://d2xsxph8kpxj0f.cloudfront.net/310519663442540562/eG7tCpxgJHL2beNG2g3VYE/BIOGRAFIAS_d6416b1b.png"
                   alt="BLACKPINK Members"
@@ -192,12 +198,12 @@ export default function LandingHome() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
-              <div className="p-6">
-                <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                  <Users className="size-5 text-green-600" />
+              <div className="p-2 md:p-6">
+                <h2 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 flex items-center gap-2">
+                  <Users className="size-4 md:size-5 text-green-600" />
                   Biografías
                 </h2>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 text-xs md:text-sm mb-2 md:mb-4 hidden md:block">
                   Conoce las historias de tus artistas K-POP favoritos. Desde
                   sus inicios hasta sus mayores logros.
                 </p>

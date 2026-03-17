@@ -5,19 +5,22 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import LandingHome from "./pages/LandingHome";
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
 import CheckTickets from "./pages/CheckTickets";
 
 function Router() {
+  // Routing: / = Landing Home, /rifa = Raffle
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/success"} component={Success} />
-      <Route path={"/cancel"} component={Cancel} />
-      <Route path={"/check-tickets"} component={CheckTickets} />
-      <Route path={"/404"} component={NotFound} />
+      <Route path="/" component={LandingHome} />
+      <Route path="/rifa" component={Home} />
+      <Route path="/success" component={Success} />
+      <Route path="/cancel" component={Cancel} />
+      <Route path="/check-tickets" component={CheckTickets} />
+      <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>

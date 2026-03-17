@@ -30,3 +30,8 @@
 - [x] Configurar Stripe en modo LIVE (producción) - Conectado a cuenta acct_1TBTa79QDrRw4dR0 (Dedika Studio)
 - [x] Validación de teléfono: Restricción a exactamente 10 dígitos (maxLength/minLength) en frontend
 - [x] Remover validación de teléfono en servidor - responsabilidad del usuario
+- [x] Crear Landing Home con secciones: Rifas, Tienda, Galerías, Biografías
+- [x] Conectar rifa del álbum BTS a /rifa
+- [x] Placeholders "Próximamente" para otras secciones
+- [x] Aplicar estilo glassmorphism consistente con la rifa actual
+- [x] Responsive design en todas las secciones

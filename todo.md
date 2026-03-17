@@ -38,3 +38,5 @@
 - [x] Integrar imágenes de alta resolución en cada sección
 - [x] Agregar sección de estadísticas con números clave
 - [x] Integrar imágenes personalizadas de Canva: Tienda, Galerías, Biografías
+- [x] Remover apartado de estadísticas morado
+- [x] Reducir espaciado entre secciones y Rifa Destacada para móvil

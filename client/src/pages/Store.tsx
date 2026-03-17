@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, ShoppingBag, Lock } from "lucide-react";
-import { trpc } from "@/lib/trpc";
 
 interface Product {
   id: string;
@@ -18,26 +17,42 @@ interface Product {
   badge?: string;
 }
 
+const DEFAULT_PRODUCTS: Product[] = [
+  {
+    id: "1",
+    title: "Kit Fiesta Bts/bt21 Globos De Cumpleaños Decoración K-pop",
+    description:
+      "Set de 18 globos. 1 juego completo de banderola, 18 globos de látex, 1 inserto de tarta grande (2 palos), 14 insertos de tarta pequeños",
+    price: 213.84,
+    image:
+      "https://http2.mlstatic.com/D_NQ_NP_2X_730858-CBT84152775940_052025-F-kit-fiesta-btsbt21-globos-de-cumpleanos-decoracion-k-pop.webp",
+    link: "https://meli.la/14ifKUh",
+    rating: 4.9,
+    reviews: 63,
+    badge: "Nuevo",
+  },
+  {
+    id: "2",
+    title: "Bts Kpop Bangtan Boys Muñecas De Dibujos Animados 7 Pcs",
+    description: "La edad mínima recomendada para utilizarla es 5 años.",
+    price: 398,
+    image:
+      "https://http2.mlstatic.com/D_NQ_NP_2X_747539-MLA107426879435_022026-F.webp",
+    link: "https://meli.la/2EASF4B",
+    rating: 5,
+    reviews: 4,
+    badge: "Nuevo",
+  },
+];
+
 export default function Store() {
   const [, navigate] = useLocation();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(DEFAULT_PRODUCTS);
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
-  const [isAdminAuthorized, setIsAdminAuthorized] = useState(false);
-
-  // Fetch products from server
-  // TODO: Create store router
-  const productsData: Product[] = [];
-
-  useEffect(() => {
-    if (productsData) {
-      setProducts(productsData);
-    }
-  }, [productsData]);
 
   const handleAdminAccess = () => {
     if (adminPassword === "panochonas12") {
-      setIsAdminAuthorized(true);
       setShowAdminPrompt(false);
       setAdminPassword("");
       navigate("/admin");

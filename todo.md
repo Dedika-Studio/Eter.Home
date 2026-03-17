@@ -42,3 +42,4 @@
 - [x] Reducir espaciado entre secciones y Rifa Destacada para móvil
 - [x] Ajustar posición de imágenes (object-top) para enfocar parte superior y no cortar rostros
 - [x] Remover apartado de cantidad de boletos disponibles y totales en página de rifa - solo mostrar precio
+- [x] Reemplazar imagen de Tienda con versión actualizada

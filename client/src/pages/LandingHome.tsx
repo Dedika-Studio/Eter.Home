@@ -123,7 +123,7 @@ export default function LandingHome() {
             <CardContent className="p-0">
               <div className="relative h-48 bg-gradient-to-br from-blue-400 to-cyan-400 overflow-hidden">
                 <img
-                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663442540562/eG7tCpxgJHL2beNG2g3VYE/TIENDAOFICIAL_17857fef.png"
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663442540562/eG7tCpxgJHL2beNG2g3VYE/TIENDA_a3fdf310.png"
                   alt="K-POP Merchandise"
                   className="w-full h-full object-cover object-top"
                 />

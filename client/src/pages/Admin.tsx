@@ -541,11 +541,11 @@ export default function Admin() {
                   placeholder="Precio por Boleto (MXN)"
                   type="number"
                   step="0.01"
-                  value={raffleFormData.pricePerTicket || 3}
+                  value={raffleFormData.pricePerTicket ?? ""}
                   onChange={(e) =>
                     setRaffleFormData({
                       ...raffleFormData,
-                      pricePerTicket: parseFloat(e.target.value),
+                      pricePerTicket: e.target.value === "" ? undefined : parseFloat(e.target.value),
                     })
                   }
                 />

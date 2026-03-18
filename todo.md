@@ -55,3 +55,8 @@
 - [x] Aplicar ajustes de responsividad a Landing Home para móvil (reducir tamaños, ocultar descripciones, ajustar espaciados)
 - [x] Agregar logo de Mercado Libre con leyenda "Afiliados Oficiales" en Tienda
 - [x] Agregar botón Volver a todas las páginas (Tienda, Rifa, Admin)
+- [x] Cambiar botones Volver para usar history.back() en lugar de navigate("/")
+- [x] Reorganizar header en página Rifa (remover "Revisa tus boletos" y "Pago Seguro")
+- [x] Agregar botón "Ya compraste tus boletos? Revísalos aquí" debajo del precio
+- [x] Mover badge "Pago Seguro" a esquina superior del Hero
+- [x] Ajustar espaciados en móvil para evitar desajustes

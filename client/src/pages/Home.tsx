@@ -185,40 +185,25 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-border/50 shadow-sm">
-        <div className="container flex items-center justify-between h-14">
-          <div className="flex items-center gap-3">
+        <div className="container flex items-center justify-between h-12 md:h-14 px-2 md:px-4">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
             <img
               src={RAFFLE_CONFIG.logoUrl}
               alt={RAFFLE_CONFIG.storeName}
-              className="h-8 w-8 rounded-lg shadow-md"
+              className="h-6 w-6 md:h-8 md:w-8 rounded-lg shadow-md flex-shrink-0"
             />
-            <span className="font-bold text-sm tracking-tight">
+            <span className="font-bold text-xs md:text-sm tracking-tight truncate">
               {RAFFLE_CONFIG.storeName}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/check-tickets")}
-              className="gap-1 text-xs"
-            >
-              <Eye className="size-3" />
-              Revisa tus boletos
-            </Button>
-            <Badge variant="secondary" className="text-xs font-medium gap-1">
-              <ShieldCheck className="size-3" />
-              Pago Seguro
-            </Badge>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/")}
-              className="gap-1 text-xs"
-            >
-              ← Volver
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.history.back()}
+            className="gap-1 text-xs flex-shrink-0 ml-2"
+          >
+            ← Volver
+          </Button>
         </div>
       </header>
 
@@ -226,6 +211,12 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-500" />
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)', backgroundSize: '24px 24px'}} />
+        <div className="absolute top-4 right-4 z-10">
+          <Badge variant="secondary" className="text-xs font-medium gap-1 bg-white/90 backdrop-blur">
+            <ShieldCheck className="size-3" />
+            Pago Seguro
+          </Badge>
+        </div>
         <div className="relative container py-16 text-center text-white">
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md rounded-full px-4 py-1.5 mb-6 text-sm font-medium">
             <Sparkles className="size-4" />
@@ -275,6 +266,15 @@ export default function Home() {
               / boleto
             </span>
           </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/check-tickets")}
+            className="gap-2 mt-6 mx-auto block"
+          >
+            <Eye className="size-4" />
+            Ya compraste tus boletos? Revísalos aquí
+          </Button>
         </div>
       </section>
 

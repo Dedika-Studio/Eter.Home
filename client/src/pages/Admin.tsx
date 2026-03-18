@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus, Trash2, Eye, Calendar, Copy, Check } from "lucide-react";
 import { raffleThemes, type RaffleCategory } from "@shared/raffleThemes";
+import { trpc } from "@/lib/trpc";
 import {
   Dialog,
   DialogContent,
@@ -79,22 +80,44 @@ export default function Admin() {
   const [productFormData, setProductFormData] = useState<Partial<Product>>({
     title: "",
     description: "",
-    price: 0,
+    price: undefined,
     image: "",
     link: "",
-    rating: 4.5,
-    reviews: 0,
+    rating: undefined,
+    reviews: undefined,
     badge: "",
   });
 
   // Raffles state
   const [raffles, setRaffles] = useState<Raffle[]>([]);
+  const { data: dbRaffles, refetch: refetchRaffles } = trpc.raffles.list.useQuery();
+  const createRaffleMutation = trpc.raffles.create.useMutation();
+  const updateRaffleMutation = trpc.raffles.update.useMutation();
+  const deleteRaffleMutation = trpc.raffles.delete.useMutation();
+
+  // Update local state when DB raffles load
+  useEffect(() => {
+    if (dbRaffles) {
+      setRaffles(dbRaffles.map(r => ({
+        id: r.id.toString(),
+        title: r.title,
+        description: r.description || "",
+        image: r.image,
+        totalTickets: r.totalTickets,
+        pricePerTicket: r.pricePerTicket / 100,
+        drawDate: r.drawDate.toISOString().split('T')[0],
+        webhookUrl: r.webhookUrl || "",
+        category: r.category as RaffleCategory,
+      })));
+    }
+  }, [dbRaffles]);
+
   const [raffleFormData, setRaffleFormData] = useState<Partial<Raffle>>({
     title: "",
     description: "",
     image: "",
-    totalTickets: 1000,
-    pricePerTicket: 3,
+    totalTickets: undefined,
+    pricePerTicket: undefined,
     drawDate: "",
     webhookUrl: "",
     category: "otro",
@@ -149,11 +172,11 @@ export default function Admin() {
     setProductFormData({
       title: "",
       description: "",
-      price: 0,
+      price: undefined,
       image: "",
       link: "",
-      rating: 4.5,
-      reviews: 0,
+      rating: undefined,
+      reviews: undefined,
       badge: "",
     });
   };
@@ -170,7 +193,7 @@ export default function Admin() {
   };
 
   // Raffle handlers
-  const handleAddRaffle = () => {
+  const handleAddRaffle = async () => {
     if (
       !raffleFormData.title ||
       !raffleFormData.image ||
@@ -182,29 +205,44 @@ export default function Admin() {
       return;
     }
 
-    if (editingRaffleId) {
-      setRaffles(
-        raffles.map((r) =>
-          r.id === editingRaffleId
-            ? { ...raffleFormData as Raffle, id: editingRaffleId }
-            : r
-        )
-      );
-      setEditingRaffleId(null);
-    } else {
-      const newRaffle: Raffle = {
-        ...raffleFormData as Raffle,
-        id: Date.now().toString(),
-      };
-      setRaffles([...raffles, newRaffle]);
+    try {
+      if (editingRaffleId) {
+        await updateRaffleMutation.mutateAsync({
+          id: parseInt(editingRaffleId),
+          title: raffleFormData.title,
+          description: raffleFormData.description,
+          image: raffleFormData.image,
+          totalTickets: raffleFormData.totalTickets,
+          pricePerTicket: raffleFormData.pricePerTicket,
+          drawDate: raffleFormData.drawDate,
+          webhookUrl: raffleFormData.webhookUrl,
+          category: raffleFormData.category || "otro",
+        });
+        setEditingRaffleId(null);
+      } else {
+        await createRaffleMutation.mutateAsync({
+          title: raffleFormData.title,
+          description: raffleFormData.description,
+          image: raffleFormData.image,
+          totalTickets: raffleFormData.totalTickets,
+          pricePerTicket: raffleFormData.pricePerTicket,
+          drawDate: raffleFormData.drawDate,
+          webhookUrl: raffleFormData.webhookUrl,
+          category: raffleFormData.category || "otro",
+        });
+      }
+      await refetchRaffles();
+    } catch (error) {
+      console.error("Error saving raffle:", error);
+      alert("Error al guardar la rifa");
     }
 
     setRaffleFormData({
       title: "",
       description: "",
       image: "",
-      totalTickets: 1000,
-      pricePerTicket: 3,
+      totalTickets: undefined,
+      pricePerTicket: undefined,
       drawDate: "",
       webhookUrl: "",
       category: "otro",

@@ -17,6 +17,11 @@ import {
   getAvailableRandomTickets,
   getDb,
   getOrdersByPhone,
+  createRaffle,
+  getAllRaffles,
+  getRaffleById,
+  updateRaffle,
+  deleteRaffle,
 } from "./db";
 import { RAFFLE_PRODUCT } from "./products";
 import { orders } from "../drizzle/schema";
@@ -174,6 +179,74 @@ export const appRouter = router({
           buyerName: order.buyerName,
           createdAt: order.createdAt,
         };
+      }),
+  }),
+
+  raffles: router({
+    list: publicProcedure.query(async () => {
+      return getAllRaffles();
+    }),
+
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return getRaffleById(input.id);
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        image: z.string(),
+        totalTickets: z.number(),
+        pricePerTicket: z.number(),
+        drawDate: z.string(),
+        webhookUrl: z.string().optional(),
+        category: z.enum(["dinero", "electronica", "herramientas", "kpop", "moda", "otro"]),
+      }))
+      .mutation(async ({ input }) => {
+        return createRaffle({
+          title: input.title,
+          description: input.description,
+          image: input.image,
+          totalTickets: input.totalTickets,
+          pricePerTicket: Math.round(input.pricePerTicket * 100),
+          drawDate: new Date(input.drawDate),
+          webhookUrl: input.webhookUrl,
+          category: input.category,
+        });
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        image: z.string().optional(),
+        totalTickets: z.number().optional(),
+        pricePerTicket: z.number().optional(),
+        drawDate: z.string().optional(),
+        webhookUrl: z.string().optional(),
+        category: z.enum(["dinero", "electronica", "herramientas", "kpop", "moda", "otro"]).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        const updateData: any = {};
+        if (data.title) updateData.title = data.title;
+        if (data.description) updateData.description = data.description;
+        if (data.image) updateData.image = data.image;
+        if (data.totalTickets) updateData.totalTickets = data.totalTickets;
+        if (data.pricePerTicket) updateData.pricePerTicket = Math.round(data.pricePerTicket * 100);
+        if (data.drawDate) updateData.drawDate = new Date(data.drawDate);
+        if (data.webhookUrl) updateData.webhookUrl = data.webhookUrl;
+        if (data.category) updateData.category = data.category;
+        return updateRaffle(id, updateData);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return deleteRaffle(input.id);
       }),
   }),
 });

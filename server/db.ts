@@ -1,6 +1,6 @@
 import { eq, inArray, and, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, tickets, orders, type InsertOrder } from "../drizzle/schema";
+import { InsertUser, users, tickets, orders, raffles, type InsertOrder } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -196,4 +196,42 @@ export async function getAvailableRandomTickets(count: number): Promise<string[]
     .orderBy(sql`RAND()`)
     .limit(count);
   return result.map(r => r.number);
+}
+
+// Raffle functions
+export async function createRaffle(raffle: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(raffles).values(raffle);
+  return result;
+}
+
+export async function getAllRaffles() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(raffles).orderBy(desc(raffles.createdAt));
+}
+
+export async function getRaffleById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(raffles).where(eq(raffles.id, id));
+  return result[0] || null;
+}
+
+export async function updateRaffle(id: number, raffle: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.update(raffles).set(raffle).where(eq(raffles.id, id));
+}
+
+export async function deleteRaffle(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.delete(raffles).where(eq(raffles.id, id));
 }

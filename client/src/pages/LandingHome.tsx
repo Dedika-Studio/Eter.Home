@@ -114,27 +114,27 @@ export default function LandingHome() {
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="border-t border-white/40 divide-y divide-white/20">
+                  <div className="border-t border-white/40 divide-y divide-white/20 space-y-0">
                     <button
                       onClick={() => handleNavigate("/tienda")}
-                      className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2"
+                      className="w-full px-4 md:px-5 py-3 md:py-4 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/60 transition-all duration-200 flex items-center gap-3 hover:translate-x-1 animate-in fade-in slide-in-from-top-2 duration-300"
                     >
-                      <Store className="size-3 md:size-4" />
-                      Tienda
+                      <Store className="size-4 md:size-5" />
+                      <span>Tienda</span>
                     </button>
                     <button
                       onClick={() => handleNavigate("/galerias")}
-                      className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2"
+                      className="w-full px-4 md:px-5 py-3 md:py-4 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/60 transition-all duration-200 flex items-center gap-3 hover:translate-x-1 animate-in fade-in slide-in-from-top-2 duration-300 delay-75"
                     >
-                      <Images className="size-3 md:size-4" />
-                      Galerías
+                      <Images className="size-4 md:size-5" />
+                      <span>Galerias</span>
                     </button>
                     <button
                       onClick={() => handleNavigate("/biografias")}
-                      className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2"
+                      className="w-full px-4 md:px-5 py-3 md:py-4 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/60 transition-all duration-200 flex items-center gap-3 hover:translate-x-1 animate-in fade-in slide-in-from-top-2 duration-300 delay-150"
                     >
-                      <Users className="size-3 md:size-4" />
-                      Biografías
+                      <Users className="size-4 md:size-5" />
+                      <span>Biografias</span>
                     </button>
                   </div>
                 )}

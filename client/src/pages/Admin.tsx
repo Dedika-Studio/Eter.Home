@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, Trash2, Eye, Calendar } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Eye, Calendar, Copy, Check } from "lucide-react";
 import { raffleThemes, type RaffleCategory } from "@shared/raffleThemes";
 import {
   Dialog,
@@ -104,6 +104,8 @@ export default function Admin() {
   const [showRafflePreview, setShowRafflePreview] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editingRaffleId, setEditingRaffleId] = useState<string | null>(null);
+  const [copiedWebhookId, setCopiedWebhookId] = useState<string | null>(null);
+  const [generatedWebhookUrl, setGeneratedWebhookUrl] = useState<string | null>(null);
 
   const handleLogin = () => {
     if (password === ADMIN_PASSWORD) {
@@ -207,6 +209,25 @@ export default function Admin() {
       webhookUrl: "",
       category: "otro",
     });
+  };
+
+  const generateWebhookUrl = (raffleId: string) => {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/api/stripe/webhook/raffle/${raffleId}`;
+  };
+
+  const handleGenerateWebhook = () => {
+    const tempId = `raffle-${Date.now()}`;
+    const webhookUrl = generateWebhookUrl(tempId);
+    setGeneratedWebhookUrl(webhookUrl);
+  };
+
+  const handleCopyWebhook = () => {
+    if (generatedWebhookUrl) {
+      navigator.clipboard.writeText(generatedWebhookUrl);
+      setCopiedWebhookId("webhook");
+      setTimeout(() => setCopiedWebhookId(null), 2000);
+    }
   };
 
   const handleDeleteRaffle = (id: string) => {
@@ -559,8 +580,42 @@ export default function Admin() {
                   <option value="moda">👗 Moda</option>
                   <option value="otro">🎁 Otro</option>
                 </select>
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    onClick={handleGenerateWebhook}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
+                    Generar URL de Webhook
+                  </Button>
+                  {generatedWebhookUrl && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-2">
+                      <p className="text-xs font-bold text-blue-900">URL del Webhook:</p>
+                      <div className="flex gap-2">
+                        <code className="flex-1 text-xs bg-white border border-blue-200 rounded px-2 py-1 overflow-x-auto break-all">
+                          {generatedWebhookUrl}
+                        </code>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleCopyWebhook}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          {copiedWebhookId === "webhook" ? (
+                            <Check className="size-4" />
+                          ) : (
+                            <Copy className="size-4" />
+                          )}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-blue-700">
+                        Copia esta URL y registrala en Stripe para obtener el webhook secret
+                      </p>
+                    </div>
+                  )}
+                </div>
                 <Input
-                  placeholder="Webhook URL (Stripe)"
+                  placeholder="Webhook Secret (de Stripe)"
                   value={raffleFormData.webhookUrl || ""}
                   onChange={(e) =>
                     setRaffleFormData({

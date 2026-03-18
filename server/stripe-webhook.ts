@@ -18,6 +18,56 @@ const stripe = new Stripe(stripeSecretKey, {
 const webhookRouter = Router();
 
 // MUST use raw body for Stripe signature verification
+// Dynamic raffle webhook endpoint
+webhookRouter.post(
+  "/api/stripe/webhook/raffle/:raffleId",
+  raw({ type: "application/json" }),
+  async (req, res) => {
+    const { raffleId } = req.params;
+    const sig = req.headers["stripe-signature"];
+    const webhookSecret = process.env.STRIPE_LIVE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET || "";
+
+    let event: Stripe.Event;
+
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
+    } catch (err: any) {
+      console.error(`[Webhook Raffle ${raffleId}] Signature verification failed:`, err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Handle test events
+    if (event.id.startsWith("evt_test_")) {
+      console.log(`[Webhook Raffle ${raffleId}] Test event detected, returning verification response`);
+      return res.json({ verified: true });
+    }
+
+    console.log(`[Webhook Raffle ${raffleId}] Received event: ${event.type} (${event.id})`);
+
+    try {
+      switch (event.type) {
+        case "checkout.session.completed": {
+          const session = event.data.object as Stripe.Checkout.Session;
+          await handleCheckoutCompleted(session);
+          break;
+        }
+        case "checkout.session.expired": {
+          const session = event.data.object as Stripe.Checkout.Session;
+          await handleCheckoutExpired(session);
+          break;
+        }
+        default:
+          console.log(`[Webhook Raffle ${raffleId}] Unhandled event type: ${event.type}`);
+      }
+    } catch (error) {
+      console.error(`[Webhook Raffle ${raffleId}] Error processing ${event.type}:`, error);
+    }
+
+    res.json({ received: true });
+  }
+);
+
+// Original webhook endpoint (for backward compatibility)
 webhookRouter.post(
   "/api/stripe/webhook",
   raw({ type: "application/json" }),

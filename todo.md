@@ -60,3 +60,4 @@
 - [x] Agregar botón "Ya compraste tus boletos? Revísalos aquí" debajo del precio
 - [x] Mover badge "Pago Seguro" a esquina superior del Hero
 - [x] Ajustar espaciados en móvil para evitar desajustes
+- [x] Reorganizar header en Tienda: Volver a la derecha, Afiliados en el medio

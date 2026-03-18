@@ -46,7 +46,7 @@ export default function Admin() {
   const [, navigate] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
-  const [activeTab, setActiveTab] = useState<"products" | "raffles">("products");
+  const [activeTab, setActiveTab] = useState<"products" | "raffles" | "view-raffles">("products");
 
   // Products state
   const [products, setProducts] = useState<Product[]>([
@@ -361,7 +361,17 @@ export default function Admin() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Rifas
+            Crear Rifas
+          </button>
+          <button
+            onClick={() => setActiveTab("view-raffles")}
+            className={`px-4 py-2 font-medium text-sm transition-colors ${
+              activeTab === "view-raffles"
+                ? "text-purple-600 border-b-2 border-purple-600"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Ver Todas las Rifas
           </button>
         </div>
 
@@ -738,6 +748,89 @@ export default function Admin() {
                 ))
               )}
             </div>
+          </div>
+        )}
+
+        {/* View Raffles Tab */}
+        {activeTab === "view-raffles" && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Todas las Rifas</h2>
+            {raffles.length === 0 ? (
+              <Card className="bg-white/60 backdrop-blur-xl border-border/50">
+                <CardContent className="p-8 text-center">
+                  <p className="text-muted-foreground">No hay rifas creadas aún</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {raffles.map((raffle) => {
+                  const theme = raffleThemes[raffle.category || "otro"];
+                  return (
+                    <Card
+                      key={raffle.id}
+                      className="bg-white/60 backdrop-blur-xl border-border/50 overflow-hidden hover:shadow-lg transition-shadow"
+                    >
+                      <div
+                        className={`h-32 bg-gradient-to-br ${theme.gradient}`}
+                        style={{
+                          backgroundImage: `url(${raffle.image})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      >
+                        <div className="w-full h-full bg-black/20 flex items-end p-4">
+                          <Badge className="bg-white/90 text-black text-xs">
+                            {theme.icon} {raffle.category}
+                          </Badge>
+                        </div>
+                      </div>
+                      <CardContent className="p-4 space-y-3">
+                        <div>
+                          <h3 className="font-bold text-sm line-clamp-2">{raffle.title}</h3>
+                          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                            {raffle.description}
+                          </p>
+                        </div>
+                        <div className="space-y-1 text-xs">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Boletos:</span>
+                            <span className="font-bold">{raffle.totalTickets}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Precio:</span>
+                            <span className="font-bold">${raffle.pricePerTicket} MXN</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Sorteo:</span>
+                            <span className="font-bold">
+                              {new Date(raffle.drawDate).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditRaffle(raffle)}
+                            className="text-xs flex-1"
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDeleteRaffle(raffle.id)}
+                            className="text-xs"
+                          >
+                            <Trash2 className="size-3" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -101,7 +101,7 @@ export default function Store() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-12">
+      <section className="relative overflow-hidden py-4 md:py-12">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-500" />
         <div
           className="absolute inset-0 opacity-10"
@@ -111,9 +111,9 @@ export default function Store() {
             backgroundSize: "24px 24px",
           }}
         />
-        <div className="relative container text-center text-white py-8">
-          <h1 className="text-4xl font-bold mb-3">Tienda Oficial</h1>
-          <p className="text-lg text-white/90">
+        <div className="relative container text-center text-white py-3 md:py-8">
+          <h1 className="text-2xl md:text-4xl font-bold mb-1 md:mb-3">Tienda Oficial</h1>
+          <p className="text-sm md:text-lg text-white/90">
             Productos exclusivos K-POP de tus artistas favoritos
           </p>
         </div>

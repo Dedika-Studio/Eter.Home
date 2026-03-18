@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, ShoppingBag, Lock, ArrowLeft } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 interface Product {
   id: string;
@@ -12,7 +13,7 @@ interface Product {
   price: number;
   image: string;
   link: string;
-  rating: number;
+  rating?: number;
   reviews: number;
   badge?: string;
 }
@@ -50,6 +51,24 @@ export default function Store() {
   const [products, setProducts] = useState<Product[]>(DEFAULT_PRODUCTS);
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
+  const { data: dbProducts } = trpc.products.list.useQuery();
+
+  useEffect(() => {
+    if (dbProducts && dbProducts.length > 0) {
+      const formattedProducts = dbProducts.map((p: any) => ({
+        id: p.id.toString(),
+        title: p.title,
+        description: p.description || "",
+        price: p.price / 100,
+        image: p.image,
+        link: p.link,
+        rating: p.rating ? p.rating / 10 : undefined,
+        reviews: p.reviews,
+        badge: p.badge || undefined,
+      }));
+      setProducts(formattedProducts);
+    }
+  }, [dbProducts]);
 
   const handleAdminAccess = () => {
     if (adminPassword === "panochonas12") {
@@ -62,7 +81,8 @@ export default function Store() {
     }
   };
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating?: number) => {
+    if (!rating) return "";
     let stars = "";
     for (let i = 0; i < 5; i++) {
       if (rating >= i + 1) stars += "★";

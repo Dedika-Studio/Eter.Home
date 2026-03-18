@@ -119,3 +119,23 @@ export const purchases = mysqlTable("purchases", {
 
 export type Purchase = typeof purchases.$inferSelect;
 export type InsertPurchase = typeof purchases.$inferInsert;
+
+/**
+ * Products table: stores store products for sale.
+ */
+export const products = mysqlTable("products", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  price: int("price").notNull(), // in cents
+  image: text("image").notNull(),
+  link: text("link").notNull(),
+  rating: int("rating"), // stored as integer (e.g., 45 = 4.5)
+  reviews: int("reviews").default(0).notNull(),
+  badge: varchar("badge", { length: 100 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Product = typeof products.$inferSelect;
+export type InsertProduct = typeof products.$inferInsert;

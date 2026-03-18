@@ -1,0 +1,75 @@
+// Product handlers
+const handleAddProduct = async () => {
+  if (
+    !productFormData.title ||
+    !productFormData.image ||
+    !productFormData.link ||
+    productFormData.price === undefined
+  ) {
+    alert("Llena los campos obligatorios");
+    return;
+  }
+
+  try {
+    if (editingProductId) {
+      await updateProductMutation.mutateAsync({
+        id: parseInt(editingProductId),
+        title: productFormData.title,
+        description: productFormData.description,
+        price: productFormData.price,
+        image: productFormData.image,
+        link: productFormData.link,
+        rating: productFormData.rating,
+        reviews: productFormData.reviews,
+        badge: productFormData.badge,
+      });
+      setEditingProductId(null);
+    } else {
+      await createProductMutation.mutateAsync({
+        title: productFormData.title,
+        description: productFormData.description,
+        price: productFormData.price,
+        image: productFormData.image,
+        link: productFormData.link,
+        rating: productFormData.rating,
+        reviews: productFormData.reviews,
+        badge: productFormData.badge,
+      });
+    }
+
+    await refetchProducts();
+
+    setProductFormData({
+      title: "",
+      description: "",
+      price: undefined,
+      image: "",
+      link: "",
+      rating: undefined,
+      reviews: undefined,
+      badge: "",
+    });
+  } catch (error) {
+    console.error("Error saving product:", error);
+    alert("Error al guardar el producto");
+  }
+};
+
+const handleDeleteProduct = async (id: string) => {
+  if (confirm("¿Eliminar este producto?")) {
+    try {
+      await deleteProductMutation.mutateAsync({
+        id: parseInt(id),
+      });
+      await refetchProducts();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("Error al eliminar el producto");
+    }
+  }
+};
+
+const handleEditProduct = (product: Product) => {
+  setProductFormData(product);
+  setEditingProductId(product.id);
+};

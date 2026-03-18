@@ -23,7 +23,7 @@ interface Product {
   price: number;
   image: string;
   link: string;
-  rating: number;
+  rating?: number;
   reviews: number;
   badge?: string;
 }
@@ -89,6 +89,31 @@ export default function Admin() {
     badge: "",
   });
 
+  // Products state
+  const { data: dbProducts, refetch: refetchProducts } = trpc.products.list.useQuery();
+  const createProductMutation = trpc.products.create.useMutation();
+  const updateProductMutation = trpc.products.update.useMutation();
+  const deleteProductMutation = trpc.products.delete.useMutation();
+
+  // Update local state when DB products load
+  useEffect(() => {
+    if (dbProducts) {
+      setProducts(
+        dbProducts.map((p) => ({
+          id: p.id.toString(),
+          title: p.title,
+          description: p.description || "",
+          price: p.price / 100,
+          image: p.image,
+          link: p.link,
+          rating: p.rating ? p.rating / 10 : undefined,
+          reviews: p.reviews,
+          badge: p.badge || undefined,
+        }))
+      );
+    }
+  }, [dbProducts]);
+
   // Raffles state
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const { data: dbRaffles, refetch: refetchRaffles } = trpc.raffles.list.useQuery();
@@ -110,6 +135,9 @@ export default function Admin() {
         webhookUrl: r.webhookUrl || "",
         category: r.category as RaffleCategory,
       })));
+      // Update nextRaffleNumber based on the highest raffleNumber in the database
+      const maxRaffleNumber = Math.max(...dbRaffles.map(r => r.raffleNumber || 0), 0);
+      setNextRaffleNumber(maxRaffleNumber + 1);
     }
   }, [dbRaffles]);
 
@@ -117,9 +145,9 @@ export default function Admin() {
     title: "",
     description: "",
     image: "",
-    totalTickets: undefined,
+    totalTickets: 1000,
     pricePerTicket: undefined,
-    drawDate: "",
+    drawDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
     webhookUrl: "",
     category: "otro",
   });
@@ -144,7 +172,7 @@ export default function Admin() {
   };
 
   // Product handlers
-  const handleAddProduct = () => {
+  const handleAddProduct = async () => {
     if (
       !productFormData.title ||
       !productFormData.image ||
@@ -155,38 +183,62 @@ export default function Admin() {
       return;
     }
 
-    if (editingProductId) {
-      setProducts(
-        products.map((p) =>
-          p.id === editingProductId
-            ? { ...productFormData as Product, id: editingProductId }
-            : p
-        )
-      );
-      setEditingProductId(null);
-    } else {
-      const newProduct: Product = {
-        ...productFormData as Product,
-        id: Date.now().toString(),
-      };
-      setProducts([...products, newProduct]);
-    }
+    try {
+      if (editingProductId) {
+        await updateProductMutation.mutateAsync({
+          id: parseInt(editingProductId),
+          title: productFormData.title,
+          description: productFormData.description,
+          price: productFormData.price,
+          image: productFormData.image,
+          link: productFormData.link,
+          rating: productFormData.rating,
+          reviews: productFormData.reviews,
+          badge: productFormData.badge,
+        });
+        setEditingProductId(null);
+      } else {
+        await createProductMutation.mutateAsync({
+          title: productFormData.title,
+          description: productFormData.description,
+          price: productFormData.price,
+          image: productFormData.image,
+          link: productFormData.link,
+          rating: productFormData.rating,
+          reviews: productFormData.reviews,
+          badge: productFormData.badge,
+        });
+      }
 
-    setProductFormData({
-      title: "",
-      description: "",
-      price: undefined,
-      image: "",
-      link: "",
-      rating: undefined,
-      reviews: undefined,
-      badge: "",
-    });
+      await refetchProducts();
+
+      setProductFormData({
+        title: "",
+        description: "",
+        price: undefined,
+        image: "",
+        link: "",
+        rating: undefined,
+        reviews: undefined,
+        badge: "",
+      });
+    } catch (error) {
+      console.error("Error saving product:", error);
+      alert("Error al guardar el producto");
+    }
   };
 
-  const handleDeleteProduct = (id: string) => {
+  const handleDeleteProduct = async (id: string) => {
     if (confirm("¿Eliminar este producto?")) {
-      setProducts(products.filter((p) => p.id !== id));
+      try {
+        await deleteProductMutation.mutateAsync({
+          id: parseInt(id),
+        });
+        await refetchProducts();
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        alert("Error al eliminar el producto");
+      }
     }
   };
 
@@ -197,6 +249,8 @@ export default function Admin() {
 
   // Raffle handlers
   const handleAddRaffle = async () => {
+    console.log("[handleAddRaffle] Form data:", raffleFormData);
+    
     if (
       !raffleFormData.title ||
       !raffleFormData.image ||
@@ -204,9 +258,27 @@ export default function Admin() {
       raffleFormData.totalTickets === undefined ||
       raffleFormData.pricePerTicket === undefined
     ) {
+      console.log("[handleAddRaffle] Missing required fields");
       alert("Llena los campos obligatorios");
       return;
     }
+
+    // Validate that image is a URL, not base64 data
+    const imageStr = String(raffleFormData.image).trim();
+    if (!imageStr.startsWith('http://') && !imageStr.startsWith('https://')) {
+      console.log("[handleAddRaffle] Invalid image URL:", imageStr.substring(0, 50));
+      alert("La imagen debe ser una URL que comience con http:// o https://");
+      return;
+    }
+
+    // Prevent base64 data from being submitted
+    if (imageStr.startsWith('data:')) {
+      console.log("[handleAddRaffle] Base64 data detected");
+      alert("No se permiten datos en base64. Por favor, usa una URL de imagen.");
+      return;
+    }
+    
+    console.log("[handleAddRaffle] Validation passed, proceeding with mutation");
 
     try {
       if (editingRaffleId) {
@@ -238,7 +310,8 @@ export default function Admin() {
       await refetchRaffles();
     } catch (error) {
       console.error("Error saving raffle:", error);
-      alert("Error al guardar la rifa");
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`Error al guardar la rifa: ${errorMessage}`);
     }
 
     setRaffleFormData({

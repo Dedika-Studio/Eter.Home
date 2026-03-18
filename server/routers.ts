@@ -3,6 +3,7 @@ import { RAFFLE_CONFIG } from "@shared/raffle";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { ordersRouter } from "./routers/orders";
+import { productsRouter } from "./routers/products";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import Stripe from "stripe";
@@ -23,6 +24,11 @@ import {
   getRaffleByNumber,
   updateRaffle,
   deleteRaffle,
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
 } from "./db";
 import { RAFFLE_PRODUCT } from "./products";
 import { orders } from "../drizzle/schema";
@@ -40,6 +46,7 @@ console.log(`[Stripe] Using ${stripeSecretKey.startsWith('sk_live_') ? 'LIVE' : 
 export const appRouter = router({
   system: systemRouter,
   orders: ordersRouter,
+  products: productsRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -200,7 +207,7 @@ export const appRouter = router({
         return getRaffleByNumber(input.raffleNumber);
       }),
 
-    create: protectedProcedure
+    create: publicProcedure
       .input(z.object({
         title: z.string(),
         description: z.string().optional(),
@@ -213,13 +220,23 @@ export const appRouter = router({
         raffleNumber: z.number(),
       }))
       .mutation(async ({ input }) => {
+        // Validate drawDate
+        if (!input.drawDate || input.drawDate.trim() === "") {
+          throw new Error("La fecha del sorteo es requerida");
+        }
+        
+        const drawDate = new Date(input.drawDate);
+        if (isNaN(drawDate.getTime())) {
+          throw new Error("Formato de fecha inválido");
+        }
+        
         return createRaffle({
           title: input.title,
           description: input.description,
           image: input.image,
           totalTickets: input.totalTickets,
           pricePerTicket: Math.round(input.pricePerTicket * 100),
-          drawDate: new Date(input.drawDate),
+          drawDate: drawDate,
           webhookUrl: input.webhookUrl,
           category: input.category,
           raffleNumber: input.raffleNumber,
@@ -227,7 +244,7 @@ export const appRouter = router({
         });
       }),
 
-    update: protectedProcedure
+    update: publicProcedure
       .input(z.object({
         id: z.number(),
         title: z.string().optional(),
@@ -253,7 +270,7 @@ export const appRouter = router({
         return updateRaffle(id, updateData);
       }),
 
-    delete: protectedProcedure
+    delete: publicProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         return deleteRaffle(input.id);

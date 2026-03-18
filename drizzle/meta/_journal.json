@@ -43,6 +43,13 @@
       "when": 1773804053184,
       "tag": "0005_nebulous_maria_hill",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1773818642841,
+      "tag": "0006_public_valkyrie",
+      "breakpoints": true
     }
   ]
 }

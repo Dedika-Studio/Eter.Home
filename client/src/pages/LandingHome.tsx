@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
+import { useState, useRef, useEffect } from "react";
 import {
   Sparkles,
   ShieldCheck,
@@ -11,11 +12,30 @@ import {
   Users,
   ArrowRight,
   Clock,
+  ChevronDown,
 } from "lucide-react";
 import { RAFFLE_CONFIG } from "@shared/raffle";
 
 export default function LandingHome() {
   const [, navigate] = useLocation();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setIsDropdownOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,15 +94,44 @@ export default function LandingHome() {
               <span className="hidden md:inline">Ir a Rifas</span>
               <span className="md:hidden">Rifas</span>
             </Button>
-            <Button
-              onClick={() => navigate("/tienda")}
-              variant="outline"
-              className="gap-1 md:gap-2 bg-white/20 border-white/40 text-white hover:bg-white/30 text-xs md:text-sm py-1 md:py-2"
-            >
-              <Store className="size-3 md:size-4" />
-              <span className="hidden md:inline">Explorar</span>
-              <span className="md:hidden">Tienda</span>
-            </Button>
+            <div className="relative" ref={dropdownRef}>
+              <Button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                variant="outline"
+                className="gap-1 md:gap-2 bg-white/20 border-white/40 text-white hover:bg-white/30 text-xs md:text-sm py-1 md:py-2"
+              >
+                <Store className="size-3 md:size-4" />
+                <span className="hidden md:inline">Explorar</span>
+                <span className="md:hidden">Menú</span>
+                <ChevronDown className={`size-3 md:size-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </Button>
+
+              {isDropdownOpen && (
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white/70 backdrop-blur-xl border border-white/40 rounded-lg shadow-lg overflow-hidden z-50">
+                  <button
+                    onClick={() => handleNavigate("/tienda")}
+                    className="w-full px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2"
+                  >
+                    <Store className="size-4" />
+                    Tienda
+                  </button>
+                  <button
+                    onClick={() => handleNavigate("/galerias")}
+                    className="w-full px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2 border-t border-white/20"
+                  >
+                    <Images className="size-4" />
+                    Galerías
+                  </button>
+                  <button
+                    onClick={() => handleNavigate("/biografias")}
+                    className="w-full px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2 border-t border-white/20"
+                  >
+                    <Users className="size-4" />
+                    Biografías
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>

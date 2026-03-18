@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Clock,
   ChevronDown,
+  Lightbulb,
 } from "lucide-react";
 import { RAFFLE_CONFIG } from "@shared/raffle";
 
@@ -105,7 +106,7 @@ export default function LandingHome() {
                   className="w-full flex items-center justify-between gap-1 md:gap-2 hover:bg-white/30 text-xs md:text-sm py-1 md:py-2 px-3 md:px-4 transition-colors"
                 >
                   <div className="flex items-center gap-1 md:gap-2">
-                    <Store className="size-3 md:size-4" />
+                    <Lightbulb className="size-3 md:size-4" />
                     <span className="hidden md:inline">Explorar</span>
                     <span className="md:hidden">Menú</span>
                   </div>

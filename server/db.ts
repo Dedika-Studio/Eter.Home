@@ -203,7 +203,10 @@ export async function createRaffle(raffle: any) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const result = await db.insert(raffles).values(raffle);
+  // Exclude auto-generated fields
+  const { id, createdAt, updatedAt, ...raffleData } = raffle;
+  
+  const result = await db.insert(raffles).values(raffleData);
   return result;
 }
 

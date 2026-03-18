@@ -84,6 +84,7 @@ export const raffles = mysqlTable("raffles", {
   pricePerTicket: int("pricePerTicket").notNull(),
   drawDate: timestamp("drawDate").notNull(),
   webhookUrl: text("webhookUrl"),
+  category: mysqlEnum("category", ["dinero", "electronica", "herramientas", "kpop", "moda", "otro"]).default("otro").notNull(),
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus, Trash2, Eye, Calendar } from "lucide-react";
+import { raffleThemes, type RaffleCategory } from "@shared/raffleThemes";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ interface Raffle {
   pricePerTicket: number;
   drawDate: string;
   webhookUrl: string;
+  category: RaffleCategory;
 }
 
 const ADMIN_PASSWORD = "panochonas12";
@@ -95,6 +97,7 @@ export default function Admin() {
     pricePerTicket: 3,
     drawDate: "",
     webhookUrl: "",
+    category: "otro",
   });
 
   const [showProductPreview, setShowProductPreview] = useState(false);
@@ -202,6 +205,7 @@ export default function Admin() {
       pricePerTicket: 3,
       drawDate: "",
       webhookUrl: "",
+      category: "otro",
     });
   };
 
@@ -538,6 +542,23 @@ export default function Admin() {
                     }
                   />
                 </div>
+                <select
+                  value={raffleFormData.category || "otro"}
+                  onChange={(e) =>
+                    setRaffleFormData({
+                      ...raffleFormData,
+                      category: e.target.value as RaffleCategory,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+                >
+                  <option value="dinero">💰 Dinero</option>
+                  <option value="electronica">📱 Electrónica</option>
+                  <option value="herramientas">🔧 Herramientas</option>
+                  <option value="kpop">🎤 K-POP</option>
+                  <option value="moda">👗 Moda</option>
+                  <option value="otro">🎁 Otro</option>
+                </select>
                 <Input
                   placeholder="Webhook URL (Stripe)"
                   value={raffleFormData.webhookUrl || ""}
@@ -694,6 +715,13 @@ export default function Admin() {
               </p>
             </div>
             <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Categoría:</span>
+                <span className="font-bold">
+                  {raffleThemes[raffleFormData.category || "otro"].icon}{" "}
+                  {raffleFormData.category}
+                </span>
+              </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Boletos:</span>
                 <span className="font-bold">{raffleFormData.totalTickets}</span>

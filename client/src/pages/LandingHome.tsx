@@ -75,6 +75,7 @@ export default function LandingHome() {
               <span className="md:hidden">Rifas</span>
             </Button>
             <Button
+              onClick={() => navigate("/tienda")}
               variant="outline"
               className="gap-1 md:gap-2 bg-white/20 border-white/40 text-white hover:bg-white/30 text-xs md:text-sm py-1 md:py-2"
             >

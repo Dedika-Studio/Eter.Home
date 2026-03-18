@@ -62,7 +62,7 @@ export default function CheckTickets() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/rifa")}
             className="gap-2"
           >
             <ArrowLeft className="size-4" />

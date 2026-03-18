@@ -63,3 +63,5 @@
 - [x] Reorganizar header en Tienda: Volver a la derecha, Afiliados en el medio
 - [x] Estandarizar altura de cards en Tienda: truncar descripciones y alinear precio, calificaciones y botón al pie
 - [x] Reducir altura del hero section en Tienda: más compacto en móvil, solo título y descripción
+- [ ] Arreglar botón "Explorar" en Landing Home: darle función o retirarlo
+- [ ] Arreglar botón Volver en CheckTickets para ir a /rifa en lugar de /

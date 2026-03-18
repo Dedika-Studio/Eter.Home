@@ -29,6 +29,13 @@
       "when": 1773796918212,
       "tag": "0003_brainy_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1773800350708,
+      "tag": "0004_worthless_bastion",
+      "breakpoints": true
     }
   ]
 }

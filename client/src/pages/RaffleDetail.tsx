@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Ticket } from "lucide-react";
+import { ArrowLeft, Ticket, Loader } from "lucide-react";
 import { getTheme } from "@shared/raffleThemes";
 import type { RaffleCategory } from "@shared/raffleThemes";
+import { trpc } from "@/lib/trpc";
 
 interface Raffle {
   id: string;
@@ -23,29 +24,35 @@ export default function RaffleDetail() {
   const [, navigate] = useLocation();
   const [raffle, setRaffle] = useState<Raffle | null>(null);
   const [selectedTickets, setSelectedTickets] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { data: dbRaffle } = trpc.raffles.getById.useQuery(
+    { id: parseInt(params?.id || "0") },
+    { enabled: !!params?.id }
+  );
+  const createCheckoutMutation = trpc.raffles.createCheckout.useMutation();
 
   useEffect(() => {
-    // TODO: Fetch raffle from API using params.id
-    // For now, mock data
-    const mockRaffle: Raffle = {
-      id: params?.id || "1",
-      title: "Rifa iPhone 15 Pro",
-      description: "Gana un iPhone 15 Pro de 256GB. Sorteo en vivo el 25 de marzo.",
-      image:
-        "https://images.unsplash.com/photo-1592286927505-1def25115558?w=800&h=600&fit=crop",
-      totalTickets: 1000,
-      pricePerTicket: 50,
-      drawDate: "2026-03-25T20:00:00",
-      webhookUrl: "https://example.com/webhook",
-      category: "electronica",
-    };
-    setRaffle(mockRaffle);
-  }, [params?.id]);
+    if (dbRaffle) {
+      setRaffle({
+        id: dbRaffle.id.toString(),
+        title: dbRaffle.title,
+        description: dbRaffle.description || "",
+        image: dbRaffle.image,
+        totalTickets: dbRaffle.totalTickets,
+        pricePerTicket: dbRaffle.pricePerTicket / 100,
+        drawDate: dbRaffle.drawDate.toISOString(),
+        webhookUrl: dbRaffle.webhookUrl || "",
+        category: dbRaffle.category as RaffleCategory,
+      });
+    }
+  }, [dbRaffle]);
 
   if (!match || !raffle) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
+          <Loader className="size-8 animate-spin mx-auto mb-2" />
           <p className="text-muted-foreground">Cargando rifa...</p>
         </div>
       </div>
@@ -54,6 +61,28 @@ export default function RaffleDetail() {
 
   const theme = getTheme(raffle.category);
   const totalPrice = selectedTickets.length * raffle.pricePerTicket;
+
+  const handlePayment = async () => {
+    if (selectedTickets.length === 0) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await createCheckoutMutation.mutateAsync({
+        raffleId: parseInt(raffle.id),
+        ticketNumbers: selectedTickets.map(t => String(t).padStart(3, "0")),
+        totalAmount: Math.round(selectedTickets.length * raffle.pricePerTicket * 100),
+      });
+      
+      if (response.checkoutUrl) {
+        window.open(response.checkoutUrl, "_blank");
+      }
+    } catch (error) {
+      console.error("Error creating checkout:", error);
+      alert("Error al procesar el pago. Intenta de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -191,11 +220,16 @@ export default function RaffleDetail() {
                 )}
 
                 <Button
-                  disabled={selectedTickets.length === 0}
+                  disabled={selectedTickets.length === 0 || isLoading}
+                  onClick={handlePayment}
                   className={`w-full ${theme.buttonBg} ${theme.buttonHover} ${theme.textColor} disabled:opacity-50`}
                 >
-                  <Ticket className="size-4 mr-2" />
-                  Ir a Pagar
+                  {isLoading ? (
+                    <Loader className="size-4 mr-2 animate-spin" />
+                  ) : (
+                    <Ticket className="size-4 mr-2" />
+                  )}
+                  {isLoading ? "Procesando..." : "Ir a Pagar"}
                 </Button>
 
                 <Button variant="outline" className="w-full" onClick={() => setSelectedTickets([])}>

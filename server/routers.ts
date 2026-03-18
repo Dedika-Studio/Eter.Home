@@ -248,6 +248,47 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         return deleteRaffle(input.id);
       }),
+
+    createCheckout: publicProcedure
+      .input(z.object({
+        raffleId: z.number(),
+        ticketNumbers: z.array(z.string()),
+        totalAmount: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const raffle = await getRaffleById(input.raffleId);
+        if (!raffle) throw new Error("Rifa no encontrada");
+
+        const session = await stripe.checkout.sessions.create({
+          line_items: [
+            {
+              price_data: {
+                currency: "mxn",
+                product_data: {
+                  name: raffle.title,
+                  description: `${input.ticketNumbers.length} boletos para ${raffle.title}`,
+                },
+                unit_amount: raffle.pricePerTicket,
+              },
+              quantity: input.ticketNumbers.length,
+            },
+          ],
+          mode: "payment",
+          success_url: `${ctx.req.headers.origin || "http://localhost:3000"}/rifa/${input.raffleId}?success=true`,
+          cancel_url: `${ctx.req.headers.origin || "http://localhost:3000"}/rifa/${input.raffleId}?cancelled=true`,
+          customer_email: ctx.user?.email || undefined,
+          metadata: {
+            raffleId: input.raffleId.toString(),
+            ticketNumbers: input.ticketNumbers.join(","),
+            userId: ctx.user?.id.toString() || "guest",
+          },
+        } as any);
+
+        return {
+          checkoutUrl: session.url,
+          sessionId: session.id,
+        };
+      }),
   }),
 });
 

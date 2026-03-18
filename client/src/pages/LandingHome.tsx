@@ -116,22 +116,29 @@ export default function LandingHome() {
                 {isDropdownOpen && (
                   <div className="border-t border-white/40 divide-y divide-white/20 space-y-0">
                     <button
-                      onClick={() => handleNavigate("/tienda")}
+                      onClick={() => handleNavigate("/rifas")}
                       className="w-full px-4 md:px-5 py-3 md:py-4 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/60 transition-all duration-200 flex items-center gap-3 hover:translate-x-1 animate-in fade-in slide-in-from-top-2 duration-300"
+                    >
+                      <Ticket className="size-4 md:size-5" />
+                      <span>Todas las Rifas</span>
+                    </button>
+                    <button
+                      onClick={() => handleNavigate("/tienda")}
+                      className="w-full px-4 md:px-5 py-3 md:py-4 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/60 transition-all duration-200 flex items-center gap-3 hover:translate-x-1 animate-in fade-in slide-in-from-top-2 duration-300 delay-75"
                     >
                       <Store className="size-4 md:size-5" />
                       <span>Tienda</span>
                     </button>
                     <button
                       onClick={() => handleNavigate("/galerias")}
-                      className="w-full px-4 md:px-5 py-3 md:py-4 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/60 transition-all duration-200 flex items-center gap-3 hover:translate-x-1 animate-in fade-in slide-in-from-top-2 duration-300 delay-75"
+                      className="w-full px-4 md:px-5 py-3 md:py-4 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/60 transition-all duration-200 flex items-center gap-3 hover:translate-x-1 animate-in fade-in slide-in-from-top-2 duration-300 delay-150"
                     >
                       <Images className="size-4 md:size-5" />
                       <span>Galerias</span>
                     </button>
                     <button
                       onClick={() => handleNavigate("/biografias")}
-                      className="w-full px-4 md:px-5 py-3 md:py-4 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/60 transition-all duration-200 flex items-center gap-3 hover:translate-x-1 animate-in fade-in slide-in-from-top-2 duration-300 delay-150"
+                      className="w-full px-4 md:px-5 py-3 md:py-4 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/60 transition-all duration-200 flex items-center gap-3 hover:translate-x-1 animate-in fade-in slide-in-from-top-2 duration-300 delay-200"
                     >
                       <Users className="size-4 md:size-5" />
                       <span>Biografias</span>

@@ -92,3 +92,29 @@ export const raffles = mysqlTable("raffles", {
 
 export type Raffle = typeof raffles.$inferSelect;
 export type InsertRaffle = typeof raffles.$inferInsert;
+
+/**
+ * Purchases table: tracks user purchases of raffle tickets and products.
+ */
+export const purchases = mysqlTable("purchases", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  raffleId: int("raffleId"),
+  productId: int("productId"),
+  type: mysqlEnum("type", ["raffle", "product"]).notNull(),
+  amount: int("amount").notNull(), // in cents
+  currency: varchar("currency", { length: 3 }).default("MXN").notNull(),
+  ticketNumbers: text("ticketNumbers"), // comma-separated for raffles
+  quantity: int("quantity").default(1).notNull(), // for products
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  stripeCheckoutSessionId: varchar("stripeCheckoutSessionId", { length: 255 }),
+  status: mysqlEnum("status", ["pending", "completed", "failed", "refunded"]).default("pending").notNull(),
+  buyerName: varchar("buyerName", { length: 255 }),
+  buyerEmail: varchar("buyerEmail", { length: 320 }),
+  buyerPhone: varchar("buyerPhone", { length: 20 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Purchase = typeof purchases.$inferSelect;
+export type InsertPurchase = typeof purchases.$inferInsert;

@@ -1,0 +1,20 @@
+CREATE TABLE `purchases` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`userId` int NOT NULL,
+	`raffleId` int,
+	`productId` int,
+	`type` enum('raffle','product') NOT NULL,
+	`amount` int NOT NULL,
+	`currency` varchar(3) NOT NULL DEFAULT 'MXN',
+	`ticketNumbers` text,
+	`quantity` int NOT NULL DEFAULT 1,
+	`stripePaymentIntentId` varchar(255),
+	`stripeCheckoutSessionId` varchar(255),
+	`status` enum('pending','completed','failed','refunded') NOT NULL DEFAULT 'pending',
+	`buyerName` varchar(255),
+	`buyerEmail` varchar(320),
+	`buyerPhone` varchar(20),
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `purchases_id` PRIMARY KEY(`id`)
+);

@@ -1,6 +1,6 @@
 import { eq, inArray, and, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, tickets, orders, raffles, type InsertOrder } from "../drizzle/schema";
+import { InsertUser, users, tickets, orders, raffles, purchases, type InsertOrder, type InsertPurchase } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -234,4 +234,43 @@ export async function deleteRaffle(id: number) {
   if (!db) throw new Error("Database not available");
   
   return db.delete(raffles).where(eq(raffles.id, id));
+}
+
+// Purchase functions
+export async function createPurchase(purchase: InsertPurchase) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(purchases).values(purchase);
+  return result;
+}
+
+export async function getUserPurchases(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(purchases).where(eq(purchases.userId, userId)).orderBy(desc(purchases.createdAt));
+}
+
+export async function getPurchaseById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(purchases).where(eq(purchases.id, id));
+  return result[0] || null;
+}
+
+export async function updatePurchase(id: number, purchase: Partial<InsertPurchase>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.update(purchases).set(purchase).where(eq(purchases.id, id));
+}
+
+export async function getPurchaseByStripeCheckoutSessionId(sessionId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(purchases).where(eq(purchases.stripeCheckoutSessionId, sessionId));
+  return result[0] || null;
 }

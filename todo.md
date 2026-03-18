@@ -63,5 +63,15 @@
 - [x] Reorganizar header en Tienda: Volver a la derecha, Afiliados en el medio
 - [x] Estandarizar altura de cards en Tienda: truncar descripciones y alinear precio, calificaciones y botón al pie
 - [x] Reducir altura del hero section en Tienda: más compacto en móvil, solo título y descripción
-- [ ] Arreglar botón "Explorar" en Landing Home: darle función o retirarlo
-- [ ] Arreglar botón Volver en CheckTickets para ir a /rifa en lugar de /
+- [x] Arreglar botón "Explorar" en Landing Home: convertido a menú expandible
+- [x] Arreglar botón Volver en CheckTickets para ir a /rifa
+- [x] Menú expandible con Tienda, Galerías, Biografías
+- [x] Sistema de temas dinámicos por categoría de rifa
+- [x] Generación de URLs de webhook para rifas
+- [x] Persistencia de rifas en BD con tRPC
+- [x] Conectar rifas a Stripe con sistema de pago completo
+- [x] Crear página de listado de rifas públicas
+- [x] Crear página de Galerías
+- [x] Crear página de Biografías
+- [x] Implementar historial de compras de usuario
+- [x] Pulir detalles y UX final

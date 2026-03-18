@@ -210,6 +210,7 @@ export const appRouter = router({
         drawDate: z.string(),
         webhookUrl: z.string().optional(),
         category: z.enum(["dinero", "electronica", "herramientas", "kpop", "moda", "otro"]),
+        raffleNumber: z.number(),
       }))
       .mutation(async ({ input }) => {
         return createRaffle({
@@ -221,6 +222,8 @@ export const appRouter = router({
           drawDate: new Date(input.drawDate),
           webhookUrl: input.webhookUrl,
           category: input.category,
+          raffleNumber: input.raffleNumber,
+          isActive: true,
         });
       }),
 

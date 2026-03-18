@@ -232,6 +232,7 @@ export default function Admin() {
           drawDate: raffleFormData.drawDate,
           webhookUrl: raffleFormData.webhookUrl,
           category: raffleFormData.category || "otro",
+          raffleNumber: nextRaffleNumber,
         });
       }
       await refetchRaffles();

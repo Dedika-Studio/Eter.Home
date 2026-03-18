@@ -38,6 +38,7 @@ interface Raffle {
   drawDate: string;
   webhookUrl: string;
   category: RaffleCategory;
+  raffleNumber?: number;
 }
 
 const ADMIN_PASSWORD = "panochonas12";
@@ -128,6 +129,8 @@ export default function Admin() {
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editingRaffleId, setEditingRaffleId] = useState<string | null>(null);
   const [copiedWebhookId, setCopiedWebhookId] = useState<string | null>(null);
+  const [nextRaffleNumber, setNextRaffleNumber] = useState(1);
+  const [copiedRaffleUrl, setCopiedRaffleUrl] = useState<string | null>(null);
   const [generatedWebhookUrl, setGeneratedWebhookUrl] = useState<string | null>(null);
 
   const handleLogin = () => {
@@ -629,6 +632,33 @@ export default function Admin() {
                   <option value="otro">🎁 Otro</option>
                 </select>
                 <div className="space-y-2">
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 space-y-2">
+                    <p className="text-xs font-bold text-purple-900">URL de la Rifa:</p>
+                    <div className="flex gap-2">
+                      <code className="flex-1 text-xs bg-white border border-purple-200 rounded px-2 py-1 overflow-x-auto break-all">
+                        https://dedika-studio-eter-rifa.manus.space/rifa{nextRaffleNumber}
+                      </code>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`https://dedika-studio-eter-rifa.manus.space/rifa${nextRaffleNumber}`);
+                          setCopiedRaffleUrl("url");
+                          setTimeout(() => setCopiedRaffleUrl(null), 2000);
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700"
+                      >
+                        {copiedRaffleUrl === "url" ? (
+                          <Check className="size-4" />
+                        ) : (
+                          <Copy className="size-4" />
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-purple-700">
+                      Esta será la URL pública de tu rifa
+                    </p>
+                  </div>
                   <Button
                     type="button"
                     onClick={handleGenerateWebhook}

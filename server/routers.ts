@@ -20,6 +20,7 @@ import {
   createRaffle,
   getAllRaffles,
   getRaffleById,
+  getRaffleByNumber,
   updateRaffle,
   deleteRaffle,
 } from "./db";
@@ -191,6 +192,12 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
         return getRaffleById(input.id);
+      }),
+
+    getByNumber: publicProcedure
+      .input(z.object({ raffleNumber: z.number() }))
+      .query(async ({ input }) => {
+        return getRaffleByNumber(input.raffleNumber);
       }),
 
     create: protectedProcedure

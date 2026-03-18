@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import LandingHome from "./pages/LandingHome";
 import RaffleDetail from "./pages/RaffleDetail";
+import RaffleByNumber from "./pages/RaffleByNumber";
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
 import CheckTickets from "./pages/CheckTickets";
@@ -24,7 +25,17 @@ function Router() {
     <Switch>
       <Route path="/" component={LandingHome} />
       <Route path="/rifa" component={Home} />
-      <Route path="/rifa/:id" component={RaffleDetail} />
+      <Route path="/rifa/:raffleNumber" component={RaffleDetail} />
+      <Route path="/rifa1" component={RaffleByNumber} />
+      <Route path="/rifa2" component={RaffleByNumber} />
+      <Route path="/rifa3" component={RaffleByNumber} />
+      <Route path="/rifa4" component={RaffleByNumber} />
+      <Route path="/rifa5" component={RaffleByNumber} />
+      <Route path="/rifa6" component={RaffleByNumber} />
+      <Route path="/rifa7" component={RaffleByNumber} />
+      <Route path="/rifa8" component={RaffleByNumber} />
+      <Route path="/rifa9" component={RaffleByNumber} />
+      <Route path="/rifa10" component={RaffleByNumber} />
       <Route path="/success" component={Success} />
       <Route path="/cancel" component={Cancel} />
       <Route path="/check-tickets" component={CheckTickets} />

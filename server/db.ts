@@ -222,6 +222,14 @@ export async function getRaffleById(id: number) {
   return result[0] || null;
 }
 
+export async function getRaffleByNumber(raffleNumber: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(raffles).where(eq(raffles.raffleNumber, raffleNumber));
+  return result[0] || null;
+}
+
 export async function updateRaffle(id: number, raffle: any) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

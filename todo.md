@@ -53,3 +53,5 @@
 - [x] Cambiar Store a 2 columnas en móvil con productos más compactos
 - [x] Ajustar Landing Home a 2 secciones por línea en móvil
 - [x] Aplicar ajustes de responsividad a Landing Home para móvil (reducir tamaños, ocultar descripciones, ajustar espaciados)
+- [x] Agregar logo de Mercado Libre con leyenda "Afiliados Oficiales" en Tienda
+- [x] Agregar botón Volver a todas las páginas (Tienda, Rifa, Admin)

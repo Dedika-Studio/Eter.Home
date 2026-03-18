@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, ShoppingBag, Lock } from "lucide-react";
+import { ExternalLink, ShoppingBag, Lock, ArrowLeft } from "lucide-react";
 
 interface Product {
   id: string;
@@ -81,14 +81,24 @@ export default function Store() {
             <ShoppingBag className="size-6 text-purple-600" />
             <span className="font-bold text-sm tracking-tight">Tienda</span>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate("/")}
-            className="gap-1 text-xs"
-          >
-            ← Volver
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="gap-1 text-xs"
+            >
+              ← Volver
+            </Button>
+            <div className="flex items-center gap-1 bg-white/50 backdrop-blur px-2 py-1 rounded-md">
+              <img
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663442540562/eG7tCpxgJHL2beNG2g3VYE/Mercado-Libre-Logo-PNG1_e7fad039.png"
+                alt="Mercado Libre"
+                className="h-5"
+              />
+              <span className="text-xs font-medium text-gray-700">Afiliados Oficiales</span>
+            </div>
+          </div>
         </div>
       </header>
 

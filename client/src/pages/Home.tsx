@@ -210,6 +210,14 @@ export default function Home() {
               <ShieldCheck className="size-3" />
               Pago Seguro
             </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="gap-1 text-xs"
+            >
+              ← Volver
+            </Button>
           </div>
         </div>
       </header>

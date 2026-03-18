@@ -252,14 +252,13 @@ export default function Admin() {
     });
   };
 
-  const generateWebhookUrl = (raffleId: string) => {
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/api/stripe/webhook/raffle/${raffleId}`;
+  const generateWebhookUrl = (raffleNumber: number) => {
+    const baseUrl = "https://dedika-studio-eter-rifa.manus.space";
+    return `${baseUrl}/api/stripe/webhook/rifa${raffleNumber}`;
   };
 
   const handleGenerateWebhook = () => {
-    const tempId = `raffle-${Date.now()}`;
-    const webhookUrl = generateWebhookUrl(tempId);
+    const webhookUrl = generateWebhookUrl(nextRaffleNumber);
     setGeneratedWebhookUrl(webhookUrl);
   };
 

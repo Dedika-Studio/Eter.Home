@@ -95,42 +95,49 @@ export default function LandingHome() {
               <span className="md:hidden">Rifas</span>
             </Button>
             <div className="relative" ref={dropdownRef}>
-              <Button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                variant="outline"
-                className="gap-1 md:gap-2 bg-white/20 border-white/40 text-white hover:bg-white/30 text-xs md:text-sm py-1 md:py-2"
+              <div
+                className={`bg-white/20 border border-white/40 text-white rounded-lg overflow-hidden transition-all duration-300 ${
+                  isDropdownOpen ? "w-48" : "w-auto"
+                }`}
               >
-                <Store className="size-3 md:size-4" />
-                <span className="hidden md:inline">Explorar</span>
-                <span className="md:hidden">Menú</span>
-                <ChevronDown className={`size-3 md:size-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </Button>
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="w-full flex items-center justify-between gap-1 md:gap-2 hover:bg-white/30 text-xs md:text-sm py-1 md:py-2 px-3 md:px-4 transition-colors"
+                >
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <Store className="size-3 md:size-4" />
+                    <span className="hidden md:inline">Explorar</span>
+                    <span className="md:hidden">Menú</span>
+                  </div>
+                  <ChevronDown className={`size-3 md:size-4 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
 
-              {isDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white/70 backdrop-blur-xl border border-white/40 rounded-lg shadow-lg overflow-hidden z-50">
-                  <button
-                    onClick={() => handleNavigate("/tienda")}
-                    className="w-full px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2"
-                  >
-                    <Store className="size-4" />
-                    Tienda
-                  </button>
-                  <button
-                    onClick={() => handleNavigate("/galerias")}
-                    className="w-full px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2 border-t border-white/20"
-                  >
-                    <Images className="size-4" />
-                    Galerías
-                  </button>
-                  <button
-                    onClick={() => handleNavigate("/biografias")}
-                    className="w-full px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2 border-t border-white/20"
-                  >
-                    <Users className="size-4" />
-                    Biografías
-                  </button>
-                </div>
-              )}
+                {isDropdownOpen && (
+                  <div className="border-t border-white/40 divide-y divide-white/20">
+                    <button
+                      onClick={() => handleNavigate("/tienda")}
+                      className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2"
+                    >
+                      <Store className="size-3 md:size-4" />
+                      Tienda
+                    </button>
+                    <button
+                      onClick={() => handleNavigate("/galerias")}
+                      className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2"
+                    >
+                      <Images className="size-3 md:size-4" />
+                      Galerías
+                    </button>
+                    <button
+                      onClick={() => handleNavigate("/biografias")}
+                      className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-900 hover:bg-white/50 transition-colors flex items-center gap-2"
+                    >
+                      <Users className="size-3 md:size-4" />
+                      Biografías
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

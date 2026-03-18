@@ -61,3 +61,4 @@
 - [x] Mover badge "Pago Seguro" a esquina superior del Hero
 - [x] Ajustar espaciados en móvil para evitar desajustes
 - [x] Reorganizar header en Tienda: Volver a la derecha, Afiliados en el medio
+- [x] Estandarizar altura de cards en Tienda: truncar descripciones y alinear precio, calificaciones y botón al pie

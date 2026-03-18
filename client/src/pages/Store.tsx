@@ -135,10 +135,10 @@ export default function Store() {
             {products.map((product) => (
               <Card
                 key={product.id}
-                className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-all hover:scale-105"
+                className="bg-white/60 backdrop-blur-xl border-border/50 shadow-lg overflow-hidden hover:shadow-xl transition-all hover:scale-105 flex flex-col h-full"
               >
-                <CardContent className="p-0">
-                  <div className="relative h-32 md:h-48 bg-gradient-to-br from-purple-100 to-pink-100 overflow-hidden">
+                <CardContent className="p-0 flex flex-col h-full">
+                  <div className="relative h-32 md:h-48 bg-gradient-to-br from-purple-100 to-pink-100 overflow-hidden flex-shrink-0">
                     <img
                       src={product.image}
                       alt={product.title}
@@ -150,37 +150,39 @@ export default function Store() {
                       </Badge>
                     )}
                   </div>
-                  <div className="p-2 md:p-4">
+                  <div className="p-2 md:p-4 flex flex-col flex-grow">
                     <h3 className="font-bold text-xs md:text-sm mb-1 md:mb-2 line-clamp-2">
                       {product.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground mb-2 md:mb-3 line-clamp-2 md:line-clamp-3 hidden md:block">
+                    <p className="text-xs text-muted-foreground mb-2 md:mb-3 line-clamp-2 hidden md:block flex-grow">
                       {product.description}
                     </p>
-                    <div className="flex items-center gap-1 mb-2 md:mb-3 hidden md:flex">
-                      <span className="text-yellow-500 text-xs md:text-sm">
-                        {renderStars(product.rating)}
-                      </span>
-                      <span className="text-xs text-muted-foreground hidden md:inline">
-                        ({product.rating} • {product.reviews} calificaciones)
-                      </span>
-                    </div>
-                    <div className="mb-2 md:mb-4">
-                      <div className="text-lg md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
-                        ${product.price} MXN
+                    <div className="mt-auto space-y-2 md:space-y-3">
+                      <div className="flex items-center gap-1 hidden md:flex">
+                        <span className="text-yellow-500 text-xs md:text-sm">
+                          {renderStars(product.rating)}
+                        </span>
+                        <span className="text-xs text-muted-foreground hidden md:inline">
+                          ({product.rating} • {product.reviews} calificaciones)
+                        </span>
                       </div>
+                      <div>
+                        <div className="text-lg md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
+                          ${product.price} MXN
+                        </div>
+                      </div>
+                      <a
+                        href={product.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button className="w-full gap-1 md:gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-xs md:text-sm py-1 md:py-2">
+                          <ExternalLink className="size-3 md:size-4" />
+                          <span className="hidden md:inline">Ver en Mercado Libre</span>
+                          <span className="md:hidden">Ver</span>
+                        </Button>
+                      </a>
                     </div>
-                    <a
-                      href={product.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button className="w-full gap-1 md:gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-xs md:text-sm py-1 md:py-2">
-                        <ExternalLink className="size-3 md:size-4" />
-                        <span className="hidden md:inline">Ver en Mercado Libre</span>
-                        <span className="md:hidden">Ver</span>
-                      </Button>
-                    </a>
                   </div>
                 </CardContent>
               </Card>

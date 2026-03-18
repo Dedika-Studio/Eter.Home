@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, Trash2, Eye } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Eye, Calendar } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -26,12 +26,26 @@ interface Product {
   badge?: string;
 }
 
+interface Raffle {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  totalTickets: number;
+  pricePerTicket: number;
+  drawDate: string;
+  webhookUrl: string;
+}
+
 const ADMIN_PASSWORD = "panochonas12";
 
 export default function Admin() {
   const [, navigate] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
+  const [activeTab, setActiveTab] = useState<"products" | "raffles">("products");
+
+  // Products state
   const [products, setProducts] = useState<Product[]>([
     {
       id: "1",
@@ -60,7 +74,7 @@ export default function Admin() {
     },
   ]);
 
-  const [formData, setFormData] = useState<Partial<Product>>({
+  const [productFormData, setProductFormData] = useState<Partial<Product>>({
     title: "",
     description: "",
     price: 0,
@@ -71,8 +85,22 @@ export default function Admin() {
     badge: "",
   });
 
-  const [showPreview, setShowPreview] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  // Raffles state
+  const [raffles, setRaffles] = useState<Raffle[]>([]);
+  const [raffleFormData, setRaffleFormData] = useState<Partial<Raffle>>({
+    title: "",
+    description: "",
+    image: "",
+    totalTickets: 1000,
+    pricePerTicket: 3,
+    drawDate: "",
+    webhookUrl: "",
+  });
+
+  const [showProductPreview, setShowProductPreview] = useState(false);
+  const [showRafflePreview, setShowRafflePreview] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [editingRaffleId, setEditingRaffleId] = useState<string | null>(null);
 
   const handleLogin = () => {
     if (password === ADMIN_PASSWORD) {
@@ -84,33 +112,36 @@ export default function Admin() {
     }
   };
 
+  // Product handlers
   const handleAddProduct = () => {
     if (
-      !formData.title ||
-      !formData.image ||
-      !formData.link ||
-      formData.price === undefined
+      !productFormData.title ||
+      !productFormData.image ||
+      !productFormData.link ||
+      productFormData.price === undefined
     ) {
       alert("Llena los campos obligatorios");
       return;
     }
 
-    if (editingId) {
+    if (editingProductId) {
       setProducts(
         products.map((p) =>
-          p.id === editingId ? { ...formData as Product, id: editingId } : p
+          p.id === editingProductId
+            ? { ...productFormData as Product, id: editingProductId }
+            : p
         )
       );
-      setEditingId(null);
+      setEditingProductId(null);
     } else {
       const newProduct: Product = {
-        ...formData as Product,
+        ...productFormData as Product,
         id: Date.now().toString(),
       };
       setProducts([...products, newProduct]);
     }
 
-    setFormData({
+    setProductFormData({
       title: "",
       description: "",
       price: 0,
@@ -129,8 +160,60 @@ export default function Admin() {
   };
 
   const handleEditProduct = (product: Product) => {
-    setFormData(product);
-    setEditingId(product.id);
+    setProductFormData(product);
+    setEditingProductId(product.id);
+  };
+
+  // Raffle handlers
+  const handleAddRaffle = () => {
+    if (
+      !raffleFormData.title ||
+      !raffleFormData.image ||
+      !raffleFormData.drawDate ||
+      raffleFormData.totalTickets === undefined ||
+      raffleFormData.pricePerTicket === undefined
+    ) {
+      alert("Llena los campos obligatorios");
+      return;
+    }
+
+    if (editingRaffleId) {
+      setRaffles(
+        raffles.map((r) =>
+          r.id === editingRaffleId
+            ? { ...raffleFormData as Raffle, id: editingRaffleId }
+            : r
+        )
+      );
+      setEditingRaffleId(null);
+    } else {
+      const newRaffle: Raffle = {
+        ...raffleFormData as Raffle,
+        id: Date.now().toString(),
+      };
+      setRaffles([...raffles, newRaffle]);
+    }
+
+    setRaffleFormData({
+      title: "",
+      description: "",
+      image: "",
+      totalTickets: 1000,
+      pricePerTicket: 3,
+      drawDate: "",
+      webhookUrl: "",
+    });
+  };
+
+  const handleDeleteRaffle = (id: string) => {
+    if (confirm("¿Eliminar esta rifa?")) {
+      setRaffles(raffles.filter((r) => r.id !== id));
+    }
+  };
+
+  const handleEditRaffle = (raffle: Raffle) => {
+    setRaffleFormData(raffle);
+    setEditingRaffleId(raffle.id);
   };
 
   const renderStars = (rating: number) => {
@@ -179,7 +262,7 @@ export default function Admin() {
         <div className="container flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <span className="font-bold text-sm tracking-tight">
-              Admin - Gestión de Productos
+              Admin Panel - ETER KPOP MX
             </span>
           </div>
           <Button
@@ -194,293 +277,446 @@ export default function Admin() {
         </div>
       </header>
 
-      <section className="container py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Form */}
-          <Card className="lg:col-span-1 bg-white/60 backdrop-blur-xl border-border/50">
-            <CardContent className="p-6">
-              <h2 className="text-lg font-bold mb-4">
-                {editingId ? "Editar Producto" : "Nuevo Producto"}
-              </h2>
+      {/* Tabs */}
+      <div className="container py-6">
+        <div className="flex gap-4 border-b border-border/50 mb-8">
+          <button
+            onClick={() => setActiveTab("products")}
+            className={`px-4 py-2 font-medium text-sm transition-colors ${
+              activeTab === "products"
+                ? "text-purple-600 border-b-2 border-purple-600"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Productos
+          </button>
+          <button
+            onClick={() => setActiveTab("raffles")}
+            className={`px-4 py-2 font-medium text-sm transition-colors ${
+              activeTab === "raffles"
+                ? "text-purple-600 border-b-2 border-purple-600"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Rifas
+          </button>
+        </div>
 
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground">
-                    Título *
-                  </label>
-                  <Input
-                    value={formData.title || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    placeholder="Nombre del producto"
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground">
-                    Descripción
-                  </label>
-                  <textarea
-                    value={formData.description || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    placeholder="Descripción"
-                    className="w-full px-3 py-2 border border-border rounded-lg mt-1 bg-background text-sm"
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground">
-                    Link Mercado Libre *
-                  </label>
-                  <Input
-                    value={formData.link || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, link: e.target.value })
-                    }
-                    placeholder="https://meli.la/..."
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground">
-                    Link Imagen *
-                  </label>
-                  <Input
-                    value={formData.image || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, image: e.target.value })
-                    }
-                    placeholder="https://..."
-                    className="mt-1"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-xs font-semibold text-muted-foreground">
-                      Precio *
-                    </label>
-                    <Input
-                      type="number"
-                      value={formData.price || 0}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          price: parseFloat(e.target.value),
-                        })
-                      }
-                      placeholder="0"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-muted-foreground">
-                      Calificación
-                    </label>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      value={formData.rating || 4.5}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          rating: parseFloat(e.target.value),
-                        })
-                      }
-                      placeholder="4.5"
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-xs font-semibold text-muted-foreground">
-                      # Reseñas
-                    </label>
-                    <Input
-                      type="number"
-                      value={formData.reviews || 0}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          reviews: parseInt(e.target.value),
-                        })
-                      }
-                      placeholder="0"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-muted-foreground">
-                      Badge
-                    </label>
-                    <select
-                      value={formData.badge || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, badge: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-border rounded-lg mt-1 bg-background text-sm"
-                    >
-                      <option value="">Ninguno</option>
-                      <option value="Nuevo">Nuevo</option>
-                      <option value="Popular">Popular</option>
-                      <option value="Recomendado">Recomendado</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button
-                    onClick={() => setShowPreview(true)}
-                    variant="outline"
-                    className="flex-1 gap-1"
-                  >
-                    <Eye className="size-4" />
-                    Vista previa
-                  </Button>
+        {/* Products Tab */}
+        {activeTab === "products" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Product Form */}
+            <Card className="lg:col-span-1 bg-white/60 backdrop-blur-xl border-border/50">
+              <CardContent className="p-6 space-y-4">
+                <h2 className="font-bold text-lg">
+                  {editingProductId ? "Editar Producto" : "Nuevo Producto"}
+                </h2>
+                <Input
+                  placeholder="Título"
+                  value={productFormData.title || ""}
+                  onChange={(e) =>
+                    setProductFormData({
+                      ...productFormData,
+                      title: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Descripción"
+                  value={productFormData.description || ""}
+                  onChange={(e) =>
+                    setProductFormData({
+                      ...productFormData,
+                      description: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Precio"
+                  type="number"
+                  value={productFormData.price || 0}
+                  onChange={(e) =>
+                    setProductFormData({
+                      ...productFormData,
+                      price: parseFloat(e.target.value),
+                    })
+                  }
+                />
+                <Input
+                  placeholder="URL Imagen"
+                  value={productFormData.image || ""}
+                  onChange={(e) =>
+                    setProductFormData({
+                      ...productFormData,
+                      image: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Link Mercado Libre"
+                  value={productFormData.link || ""}
+                  onChange={(e) =>
+                    setProductFormData({
+                      ...productFormData,
+                      link: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Rating (0-5)"
+                  type="number"
+                  step="0.1"
+                  value={productFormData.rating || 4.5}
+                  onChange={(e) =>
+                    setProductFormData({
+                      ...productFormData,
+                      rating: parseFloat(e.target.value),
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Reviews"
+                  type="number"
+                  value={productFormData.reviews || 0}
+                  onChange={(e) =>
+                    setProductFormData({
+                      ...productFormData,
+                      reviews: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Badge (ej: Nuevo)"
+                  value={productFormData.badge || ""}
+                  onChange={(e) =>
+                    setProductFormData({
+                      ...productFormData,
+                      badge: e.target.value,
+                    })
+                  }
+                />
+                <div className="flex gap-2">
                   <Button
                     onClick={handleAddProduct}
-                    className="flex-1 gap-1 bg-purple-600 hover:bg-purple-700"
+                    className="flex-1 bg-purple-600 hover:bg-purple-700"
                   >
-                    <Plus className="size-4" />
-                    {editingId ? "Actualizar" : "Agregar"}
+                    <Plus className="size-4 mr-2" />
+                    {editingProductId ? "Actualizar" : "Agregar"}
+                  </Button>
+                  <Button
+                    onClick={() => setShowProductPreview(true)}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Eye className="size-4 mr-2" />
+                    Vista Previa
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
 
-                {editingId && (
-                  <Button
-                    onClick={() => {
-                      setEditingId(null);
-                      setFormData({
-                        title: "",
-                        description: "",
-                        price: 0,
-                        image: "",
-                        link: "",
-                        rating: 4.5,
-                        reviews: 0,
-                        badge: "",
-                      });
-                    }}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Cancelar edición
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Products List */}
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-lg font-bold">Productos ({products.length})</h2>
-            {products.map((product) => (
-              <Card
-                key={product.id}
-                className="bg-white/60 backdrop-blur-xl border-border/50"
-              >
-                <CardContent className="p-4">
-                  <div className="flex gap-4">
+            {/* Products List */}
+            <div className="lg:col-span-2 space-y-4">
+              <h2 className="font-bold text-lg">Productos ({products.length})</h2>
+              {products.map((product) => (
+                <Card
+                  key={product.id}
+                  className="bg-white/60 backdrop-blur-xl border-border/50 overflow-hidden"
+                >
+                  <CardContent className="p-4 flex gap-4">
                     <img
                       src={product.image}
                       alt={product.title}
-                      className="w-20 h-20 object-cover rounded-lg"
+                      className="w-24 h-24 object-cover rounded-lg"
                     />
                     <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-bold text-sm line-clamp-2">
-                          {product.title}
-                        </h3>
-                        {product.badge && (
-                          <Badge className="bg-red-500 ml-2">
-                            {product.badge}
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mb-2 line-clamp-1">
-                        {product.description}
+                      <h3 className="font-bold text-sm line-clamp-2">
+                        {product.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        ${product.price} MXN
                       </p>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-sm font-bold text-purple-600">
-                            ${product.price} MXN
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {renderStars(product.rating)} ({product.rating} •{" "}
-                            {product.reviews})
-                          </div>
-                        </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditProduct(product)}
+                          className="text-xs"
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="text-xs"
+                        >
+                          <Trash2 className="size-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Raffles Tab */}
+        {activeTab === "raffles" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Raffle Form */}
+            <Card className="lg:col-span-1 bg-white/60 backdrop-blur-xl border-border/50">
+              <CardContent className="p-6 space-y-4">
+                <h2 className="font-bold text-lg">
+                  {editingRaffleId ? "Editar Rifa" : "Nueva Rifa"}
+                </h2>
+                <Input
+                  placeholder="Título de la Rifa"
+                  value={raffleFormData.title || ""}
+                  onChange={(e) =>
+                    setRaffleFormData({
+                      ...raffleFormData,
+                      title: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Descripción"
+                  value={raffleFormData.description || ""}
+                  onChange={(e) =>
+                    setRaffleFormData({
+                      ...raffleFormData,
+                      description: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="URL Imagen"
+                  value={raffleFormData.image || ""}
+                  onChange={(e) =>
+                    setRaffleFormData({
+                      ...raffleFormData,
+                      image: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Total de Boletos"
+                  type="number"
+                  value={raffleFormData.totalTickets || 1000}
+                  onChange={(e) =>
+                    setRaffleFormData({
+                      ...raffleFormData,
+                      totalTickets: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Precio por Boleto (MXN)"
+                  type="number"
+                  step="0.01"
+                  value={raffleFormData.pricePerTicket || 3}
+                  onChange={(e) =>
+                    setRaffleFormData({
+                      ...raffleFormData,
+                      pricePerTicket: parseFloat(e.target.value),
+                    })
+                  }
+                />
+                <div className="flex items-center gap-2">
+                  <Calendar className="size-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Fecha del Sorteo"
+                    type="datetime-local"
+                    value={raffleFormData.drawDate || ""}
+                    onChange={(e) =>
+                      setRaffleFormData({
+                        ...raffleFormData,
+                        drawDate: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <Input
+                  placeholder="Webhook URL (Stripe)"
+                  value={raffleFormData.webhookUrl || ""}
+                  onChange={(e) =>
+                    setRaffleFormData({
+                      ...raffleFormData,
+                      webhookUrl: e.target.value,
+                    })
+                  }
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleAddRaffle}
+                    className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  >
+                    <Plus className="size-4 mr-2" />
+                    {editingRaffleId ? "Actualizar" : "Crear"}
+                  </Button>
+                  <Button
+                    onClick={() => setShowRafflePreview(true)}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Eye className="size-4 mr-2" />
+                    Vista Previa
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Raffles List */}
+            <div className="lg:col-span-2 space-y-4">
+              <h2 className="font-bold text-lg">Rifas ({raffles.length})</h2>
+              {raffles.length === 0 ? (
+                <Card className="bg-white/60 backdrop-blur-xl border-border/50">
+                  <CardContent className="p-8 text-center text-muted-foreground">
+                    No hay rifas creadas aún
+                  </CardContent>
+                </Card>
+              ) : (
+                raffles.map((raffle) => (
+                  <Card
+                    key={raffle.id}
+                    className="bg-white/60 backdrop-blur-xl border-border/50 overflow-hidden"
+                  >
+                    <CardContent className="p-4 flex gap-4">
+                      <img
+                        src={raffle.image}
+                        alt={raffle.title}
+                        className="w-24 h-24 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h3 className="font-bold text-sm line-clamp-2">
+                          {raffle.title}
+                        </h3>
+                        <p className="text-xs text-muted-foreground mb-1">
+                          ${raffle.pricePerTicket} MXN • {raffle.totalTickets}{" "}
+                          boletos
+                        </p>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Sorteo: {new Date(raffle.drawDate).toLocaleDateString()}
+                        </p>
                         <div className="flex gap-2">
                           <Button
-                            onClick={() => handleEditProduct(product)}
                             size="sm"
                             variant="outline"
+                            onClick={() => handleEditRaffle(raffle)}
+                            className="text-xs"
                           >
                             Editar
                           </Button>
                           <Button
-                            onClick={() => handleDeleteProduct(product.id)}
                             size="sm"
                             variant="destructive"
-                            className="gap-1"
+                            onClick={() => handleDeleteRaffle(raffle.id)}
+                            className="text-xs"
                           >
                             <Trash2 className="size-3" />
                           </Button>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        )}
+      </div>
 
-      {/* Preview Modal */}
-      <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="bg-white/95 backdrop-blur-xl border-border/50 max-w-sm">
+      {/* Product Preview Dialog */}
+      <Dialog open={showProductPreview} onOpenChange={setShowProductPreview}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Vista previa del producto</DialogTitle>
           </DialogHeader>
           <div className="bg-white/60 backdrop-blur rounded-lg p-4">
-            {formData.image && (
+            {productFormData.image && (
               <img
-                src={formData.image}
-                alt={formData.title}
+                src={productFormData.image}
+                alt={productFormData.title}
                 className="w-full h-40 object-cover rounded-lg mb-3"
               />
             )}
-            {formData.badge && (
-              <Badge className="bg-red-500 mb-2">{formData.badge}</Badge>
+            {productFormData.badge && (
+              <Badge className="bg-red-500 mb-2">{productFormData.badge}</Badge>
             )}
-            <h3 className="font-bold text-sm mb-2">{formData.title}</h3>
+            <h3 className="font-bold text-sm mb-2">{productFormData.title}</h3>
             <p className="text-xs text-muted-foreground mb-3">
-              {formData.description}
+              {productFormData.description}
             </p>
             <div className="flex items-center gap-1 mb-3">
               <span className="text-yellow-500 text-sm">
-                {renderStars(formData.rating || 4.5)}
+                {renderStars(productFormData.rating || 4.5)}
               </span>
               <span className="text-xs text-muted-foreground">
-                ({formData.rating} • {formData.reviews})
+                ({productFormData.rating} • {productFormData.reviews})
               </span>
             </div>
             <div className="text-lg font-bold text-purple-600 mb-3">
-              ${formData.price} MXN
+              ${productFormData.price} MXN
             </div>
           </div>
           <DialogFooter>
             <Button
-              onClick={() => setShowPreview(false)}
+              onClick={() => setShowProductPreview(false)}
+              variant="outline"
+              className="w-full"
+            >
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Raffle Preview Dialog */}
+      <Dialog open={showRafflePreview} onOpenChange={setShowRafflePreview}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Vista previa de la rifa</DialogTitle>
+          </DialogHeader>
+          <div className="bg-white/60 backdrop-blur rounded-lg p-4 space-y-3">
+            {raffleFormData.image && (
+              <img
+                src={raffleFormData.image}
+                alt={raffleFormData.title}
+                className="w-full h-40 object-cover rounded-lg"
+              />
+            )}
+            <div>
+              <h3 className="font-bold text-sm mb-1">{raffleFormData.title}</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                {raffleFormData.description}
+              </p>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Boletos:</span>
+                <span className="font-bold">{raffleFormData.totalTickets}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Precio:</span>
+                <span className="font-bold">
+                  ${raffleFormData.pricePerTicket} MXN
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Sorteo:</span>
+                <span className="font-bold">
+                  {raffleFormData.drawDate
+                    ? new Date(raffleFormData.drawDate).toLocaleDateString()
+                    : "N/A"}
+                </span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={() => setShowRafflePreview(false)}
               variant="outline"
               className="w-full"
             >

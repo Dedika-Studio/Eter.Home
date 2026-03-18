@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `raffles` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`title` varchar(255) NOT NULL,\n\t`description` text,\n\t`image` text NOT NULL,\n\t`totalTickets` int NOT NULL,\n\t`pricePerTicket` int NOT NULL,\n\t`drawDate` timestamp NOT NULL,\n\t`webhookUrl` text,\n\t`isActive` boolean NOT NULL DEFAULT true,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `raffles_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3NSmzhQk57F6Qqm.root --database eG7tCpxgJHL2beNG2g3VYE --execute CREATE TABLE `raffles` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`title` varchar(255) NOT NULL,\n\t`description` text,\n\t`image` text NOT NULL,\n\t`totalTickets` int NOT NULL,\n\t`pricePerTicket` int NOT NULL,\n\t`drawDate` timestamp NOT NULL,\n\t`webhookUrl` text,\n\t`isActive` boolean NOT NULL DEFAULT true,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `raffles_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 625
+}

@@ -71,3 +71,23 @@ export const orders = mysqlTable("orders", {
 
 export type Order = typeof orders.$inferSelect;
 export type InsertOrder = typeof orders.$inferInsert;
+/**
+ * Raffles table: stores multiple raffle configurations.
+ * Each raffle can have its own tickets, pricing, and webhook.
+ */
+export const raffles = mysqlTable("raffles", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  image: text("image").notNull(),
+  totalTickets: int("totalTickets").notNull(),
+  pricePerTicket: int("pricePerTicket").notNull(),
+  drawDate: timestamp("drawDate").notNull(),
+  webhookUrl: text("webhookUrl"),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Raffle = typeof raffles.$inferSelect;
+export type InsertRaffle = typeof raffles.$inferInsert;

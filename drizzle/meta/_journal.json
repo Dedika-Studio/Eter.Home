@@ -15,6 +15,13 @@
       "when": 1773638476726,
       "tag": "0001_organic_bill_hollister",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1773796449098,
+      "tag": "0002_cultured_rumiko_fujikawa",
+      "breakpoints": true
     }
   ]
 }

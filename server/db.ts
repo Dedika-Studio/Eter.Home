@@ -33,6 +33,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     const values: InsertUser = {
       openId: user.openId,
     };
+
     const updateSet: Record<string, unknown> = {};
 
     const textFields = ["name", "email", "loginMethod"] as const;
@@ -52,6 +53,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.lastSignedIn = user.lastSignedIn;
       updateSet.lastSignedIn = user.lastSignedIn;
     }
+
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
@@ -72,29 +74,23 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       set: updateSet,
     });
   } catch (error) {
-    console.error("[Database] Failed to upsert user:", error);
-    throw error;
+    console.error("[Database] Error upserting user:", error);
   }
 }
 
-export async function getUserByOpenId(openId: string) {
+export async function getUser(openId: string) {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get user: database not available");
-    return undefined;
-  }
-
-  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
-  return result.length > 0 ? result[0] : undefined;
+  if (!db) return null;
+  const results = await db.select().from(users).where(eq(users.openId, openId));
+  return results[0] || null;
 }
 
-// ========== TICKET QUERIES ==========
+// ============ TICKET QUERIES ============
 
 export async function getAllTickets() {
   const db = await getDb();
   if (!db) return [];
-  return db.select({ number: tickets.number, status: tickets.status }).from(tickets);
+  return db.select().from(tickets);
 }
 
 export async function getTicketsByNumbers(numbers: string[]) {
@@ -112,13 +108,13 @@ export async function reserveTickets(numbers: string[], orderId: number) {
     .where(and(inArray(tickets.number, numbers), eq(tickets.status, "available")));
 }
 
-export async function markTicketsSold(orderId: number, buyerName: string, buyerPhone: string, buyerEmail: string | null) {
+export async function markTicketsSold(orderId: number, ticketNumbers: string[], buyerName: string, buyerPhone: string, buyerEmail: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const now = Date.now();
   await db.update(tickets)
     .set({ status: "sold", buyerName, buyerPhone, buyerEmail, soldAt: now })
-    .where(eq(tickets.orderId, orderId));
+    .where(inArray(tickets.number, ticketNumbers));
 }
 
 export async function releaseExpiredReservations() {
@@ -138,7 +134,7 @@ export async function releaseTicketsByOrder(orderId: number) {
     .where(and(eq(tickets.orderId, orderId), eq(tickets.status, "reserved")));
 }
 
-// ========== ORDER QUERIES ==========
+// ============ ORDER QUERIES ============
 
 export async function createOrder(data: InsertOrder) {
   const db = await getDb();
@@ -149,36 +145,24 @@ export async function createOrder(data: InsertOrder) {
 
 export async function getOrderById(id: number) {
   const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
+  if (!db) return null;
+  const results = await db.select().from(orders).where(eq(orders.id, id));
+  return results[0] || null;
 }
 
 export async function getOrderByStripeSession(sessionId: string) {
   const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(orders).where(eq(orders.stripeSessionId, sessionId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
+  if (!db) return null;
+  const results = await db.select().from(orders).where(eq(orders.stripeSessionId, sessionId));
+  return results[0] || null;
 }
 
-export async function updateOrderStatus(id: number, status: "pending" | "paid" | "failed" | "expired", paymentIntentId?: string) {
+export async function updateOrderStatus(id: number, status: string, stripePaymentIntentId?: string) {
   const db = await getDb();
   if (!db) return;
-  const updateData: Record<string, unknown> = { status };
-  if (paymentIntentId) updateData.stripePaymentIntentId = paymentIntentId;
-  await db.update(orders).set(updateData).where(eq(orders.id, id));
-}
-
-export async function markOrderSyncedToSheets(id: number) {
-  const db = await getDb();
-  if (!db) return;
-  await db.update(orders).set({ syncedToSheets: true }).where(eq(orders.id, id));
-}
-
-export async function getOrdersByUserId(userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(orders).where(eq(orders.userId, userId));
+  await db.update(orders)
+    .set({ status, stripePaymentIntentId })
+    .where(eq(orders.id, id));
 }
 
 export async function getOrdersByPhone(phone: string) {
@@ -187,139 +171,89 @@ export async function getOrdersByPhone(phone: string) {
   return db.select().from(orders).where(eq(orders.buyerPhone, phone)).orderBy(desc(orders.createdAt));
 }
 
-export async function getAvailableRandomTickets(count: number): Promise<string[]> {
+export async function getAvailableRandomTickets(count: number) {
   const db = await getDb();
   if (!db) return [];
-  const result = await db.select({ number: tickets.number })
-    .from(tickets)
-    .where(eq(tickets.status, "available"))
-    .orderBy(sql`RAND()`)
-    .limit(count);
-  return result.map(r => r.number);
+  return db.select().from(tickets).where(eq(tickets.status, "available")).limit(count);
 }
 
-// Raffle functions
-export async function createRaffle(raffle: any) {
+// ============ RAFFLE QUERIES ============
+
+export async function createRaffle(data: any) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
-  // Exclude auto-generated fields
-  const { id, createdAt, updatedAt, ...raffleData } = raffle;
-  
-  const result = await db.insert(raffles).values(raffleData);
-  return result;
+  const result = await db.insert(raffles).values(data);
+  return result[0].insertId;
 }
 
 export async function getAllRaffles() {
   const db = await getDb();
   if (!db) return [];
-  
-  return db.select().from(raffles).orderBy(desc(raffles.createdAt));
+  return db.select().from(raffles);
 }
 
 export async function getRaffleById(id: number) {
   const db = await getDb();
   if (!db) return null;
-  
-  const result = await db.select().from(raffles).where(eq(raffles.id, id));
-  return result[0] || null;
+  const results = await db.select().from(raffles).where(eq(raffles.id, id));
+  return results[0] || null;
 }
 
 export async function getRaffleByNumber(raffleNumber: number) {
   const db = await getDb();
   if (!db) return null;
-  
-  const result = await db.select().from(raffles).where(eq(raffles.raffleNumber, raffleNumber));
-  return result[0] || null;
+  const results = await db.select().from(raffles).where(eq(raffles.raffleNumber, raffleNumber));
+  return results[0] || null;
 }
 
-export async function updateRaffle(id: number, raffle: any) {
+export async function updateRaffle(id: number, data: any) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  return db.update(raffles).set(raffle).where(eq(raffles.id, id));
+  if (!db) return;
+  await db.update(raffles).set(data).where(eq(raffles.id, id));
 }
 
 export async function deleteRaffle(id: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  return db.delete(raffles).where(eq(raffles.id, id));
+  if (!db) return;
+  await db.delete(raffles).where(eq(raffles.id, id));
 }
 
-// Purchase functions
-export async function createPurchase(purchase: InsertPurchase) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  const result = await db.insert(purchases).values(purchase);
-  return result;
-}
+// ============ PRODUCT QUERIES ============
 
-export async function getUserPurchases(userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return db.select().from(purchases).where(eq(purchases.userId, userId)).orderBy(desc(purchases.createdAt));
-}
-
-export async function getPurchaseById(id: number) {
-  const db = await getDb();
-  if (!db) return null;
-  
-  const result = await db.select().from(purchases).where(eq(purchases.id, id));
-  return result[0] || null;
-}
-
-export async function updatePurchase(id: number, purchase: Partial<InsertPurchase>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  return db.update(purchases).set(purchase).where(eq(purchases.id, id));
-}
-
-export async function getPurchaseByStripeCheckoutSessionId(sessionId: string) {
-  const db = await getDb();
-  if (!db) return null;
-  
-  const result = await db.select().from(purchases).where(eq(purchases.stripeCheckoutSessionId, sessionId));
-  return result[0] || null;
-}
-
-// Product functions
 export async function getAllProducts() {
   const db = await getDb();
   if (!db) return [];
-  
-  return db.select().from(products).orderBy(desc(products.createdAt));
+  return db.select().from(products);
 }
 
 export async function getProductById(id: number) {
   const db = await getDb();
   if (!db) return null;
-  
-  const result = await db.select().from(products).where(eq(products.id, id));
-  return result[0] || null;
+  const results = await db.select().from(products).where(eq(products.id, id));
+  return results[0] || null;
 }
 
-export async function createProduct(product: InsertProduct) {
+export async function createProduct(data: any) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
-  const result = await db.insert(products).values(product);
-  return result;
+  const result = await db.insert(products).values(data);
+  return result[0].insertId;
 }
 
-export async function updateProduct(id: number, product: Partial<InsertProduct>) {
+export async function updateProduct(id: number, data: any) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  return db.update(products).set(product).where(eq(products.id, id));
+  if (!db) return;
+  await db.update(products).set(data).where(eq(products.id, id));
 }
 
 export async function deleteProduct(id: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  return db.delete(products).where(eq(products.id, id));
+  if (!db) return;
+  await db.delete(products).where(eq(products.id, id));
+}
+
+export async function markOrderSyncedToSheets(orderId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(orders).set({ syncedToSheets: true }).where(eq(orders.id, orderId));
 }

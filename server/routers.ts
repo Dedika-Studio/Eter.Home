@@ -29,6 +29,8 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  updateOrderStatus,
+  markTicketsSold,
 } from "./db";
 import { RAFFLE_PRODUCT } from "./products";
 import { orders } from "../drizzle/schema";
@@ -41,6 +43,7 @@ const stripeSecretKey = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE
 const stripe = new Stripe(stripeSecretKey, {
   apiVersion: "2025-02-24.acacia" as any,
 });
+
 console.log(`[Stripe] Using ${stripeSecretKey.startsWith('sk_live_') ? 'LIVE' : 'TEST'} mode`);
 
 export const appRouter = router({
@@ -93,17 +96,17 @@ export const appRouter = router({
         // Use phone number as provided by user
         const formattedPhone = input.buyerPhone.trim();
 
+        // Verify tickets are still available
         const ticketRows = await getTicketsByNumbers(input.ticketNumbers);
-        const unavailable = ticketRows.filter(t => t.status !== "available");
-        if (unavailable.length > 0) {
-          const nums = unavailable.map(t => t.number).join(", ");
-          throw new Error(`Boletos no disponibles: ${nums}`);
-        }
+        const availableTickets = ticketRows.filter(t => t.status === "available");
 
-        const foundNumbers = ticketRows.map(t => t.number);
-        const missing = input.ticketNumbers.filter(n => !foundNumbers.includes(n));
-        if (missing.length > 0) {
-          throw new Error(`Boletos no encontrados: ${missing.join(", ")}`);
+        if (availableTickets.length !== input.ticketNumbers.length) {
+          const foundNumbers = ticketRows.map(t => t.number);
+          const missing = input.ticketNumbers.filter(n => !foundNumbers.includes(n));
+          if (missing.length > 0) {
+            throw new Error(`Boletos no encontrados: ${missing.join(", ")}`);
+          }
+          throw new Error("Algunos boletos ya no están disponibles. Por favor, intenta con otros.");
         }
 
         const totalAmount = input.ticketNumbers.length * RAFFLE_CONFIG.pricePerTicket;
@@ -122,38 +125,35 @@ export const appRouter = router({
         await reserveTickets(input.ticketNumbers, orderId);
 
         const origin = ctx.req.headers.origin || ctx.req.headers.referer || "";
-        
+
         try {
           const session = await stripe.checkout.sessions.create({
-          payment_method_types: ["card"],
-          line_items: [
-            {
-              price_data: {
-                currency: RAFFLE_PRODUCT.currency,
-                product_data: {
-                  name: RAFFLE_PRODUCT.name,
-                  description: `${input.ticketNumbers.length} boleto(s): ${input.ticketNumbers.join(", ")}`,
-                  images: RAFFLE_PRODUCT.images,
+            payment_method_types: ["card"],
+            line_items: [
+              {
+                price_data: {
+                  currency: RAFFLE_PRODUCT.currency,
+                  product_data: {
+                    name: RAFFLE_PRODUCT.name,
+                    description: `${input.ticketNumbers.length} boleto(s): ${input.ticketNumbers.join(", ")}`,
+                    images: RAFFLE_PRODUCT.images,
+                  },
+                  unit_amount: RAFFLE_PRODUCT.unitAmount,
                 },
-                unit_amount: RAFFLE_PRODUCT.unitAmount,
+                quantity: input.ticketNumbers.length,
               },
-              quantity: input.ticketNumbers.length,
+            ],
+            mode: "payment",
+            success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${origin}/cancel?order_id=${orderId}`,
+            client_reference_id: orderId.toString(),
+            customer_email: input.buyerEmail || undefined,
+            metadata: {
+              order_id: orderId.toString(),
+              buyer_name: input.buyerName,
+              buyer_phone: formattedPhone,
             },
-          ],
-          mode: "payment",
-          success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${origin}/cancel?order_id=${orderId}`,
-          client_reference_id: orderId.toString(),
-          customer_email: input.buyerEmail || undefined,
-          metadata: {
-            order_id: orderId.toString(),
-            buyer_name: input.buyerName,
-            buyer_phone: input.buyerPhone,
-            ticket_numbers: input.ticketNumbers.join(","),
-          },
-          expires_at: Math.floor(Date.now() / 1000) + 1800,
-          allow_promotion_codes: true,
-        });
+          });
 
           const db = await getDb();
           if (db) {
@@ -188,8 +188,8 @@ export const appRouter = router({
           createdAt: order.createdAt,
         };
       }),
-    
-        confirmPayment: publicProcedure
+
+    confirmPayment: publicProcedure
       .input(z.object({
         orderId: z.number(),
         sessionId: z.string(),
@@ -197,46 +197,40 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const order = await getOrderById(input.orderId);
         if (!order) throw new Error("Orden no encontrada");
-        
+
         if (order.status === "paid") {
           console.log(`[Confirm Payment] Order ${order.id} already paid, skipping`);
           return { success: true, message: "Order already confirmed" };
         }
 
-        try {
-          // Retrieve the session from Stripe to verify payment
-          const session = await stripe.checkout.sessions.retrieve(input.sessionId);
-          
-          if (session.payment_status !== "paid") {
-            throw new Error("Payment not completed");
-          }
-
-          // Update order status to paid
-          await updateOrderStatus(order.id, "paid", session.payment_intent as string);
-
-          // Mark tickets as sold with buyer information
-          await markTicketsSold(order.id, order.buyerName, order.buyerPhone, order.buyerEmail);
-
-          // Send WhatsApp confirmation if phone is available
-          if (order.buyerPhone) {
-            const ticketNumbers = JSON.parse(order.ticketNumbers) as string[];
-            const whatsappPhone = `+52${order.buyerPhone}`;
-            await sendWhatsAppConfirmation({
-              to: whatsappPhone,
-              ticketNumbers,
-              buyerName: order.buyerName,
-              totalAmount: order.totalAmount,
-            }).catch(err => console.error("[WhatsApp] Failed to send confirmation:", err));
-          }
-
-          console.log(`[Confirm Payment] Order ${order.id} confirmed. Tickets marked as sold.`);
-          return { success: true, message: "Payment confirmed and tickets registered" };
-        } catch (error) {
-          console.error("[Confirm Payment] Error confirming payment:", error);
-          throw new Error("Error confirming payment");
+        // Verify with Stripe
+        const session = await stripe.checkout.sessions.retrieve(input.sessionId);
+        if (session.payment_status !== "paid") {
+          throw new Error("Payment not completed");
         }
-      }),
 
+        // Update order status to paid
+        await updateOrderStatus(order.id, "paid", session.payment_intent as string);
+
+        // Mark tickets as sold with buyer information
+        const ticketNumbers = JSON.parse(order.ticketNumbers) as string[];
+        await markTicketsSold(order.id, ticketNumbers, order.buyerName, order.buyerPhone, order.buyerEmail);
+
+        // Send WhatsApp confirmation if phone is available
+        if (order.buyerPhone) {
+          const ticketNumbers = JSON.parse(order.ticketNumbers) as string[];
+          const whatsappPhone = `+52${order.buyerPhone}`;
+          await sendWhatsAppConfirmation({
+            to: whatsappPhone,
+            ticketNumbers,
+            buyerName: order.buyerName,
+            totalAmount: order.totalAmount,
+          }).catch(err => console.error("[WhatsApp] Failed to send confirmation:", err));
+        }
+
+        console.log(`[Confirm Payment] Order ${order.id} confirmed. Tickets marked as sold.`);
+        return { success: true, message: "Payment confirmed and tickets registered" };
+      })
   }),
 
   raffles: router({
@@ -258,112 +252,32 @@ export const appRouter = router({
 
     create: publicProcedure
       .input(z.object({
-        title: z.string(),
-        description: z.string().optional(),
-        image: z.string(),
-        totalTickets: z.number(),
-        pricePerTicket: z.number(),
-        drawDate: z.string(),
-        webhookUrl: z.string().optional(),
-        category: z.enum(["dinero", "electronica", "herramientas", "kpop", "moda", "otro"]),
         raffleNumber: z.number(),
+        title: z.string(),
+        description: z.string(),
+        imageUrl: z.string().optional(),
+        price: z.number(),
+        totalTickets: z.number(),
+        startDate: z.date().optional(),
+        endDate: z.date().optional(),
       }))
       .mutation(async ({ input }) => {
-        // Validate drawDate
-        if (!input.drawDate || input.drawDate.trim() === "") {
-          throw new Error("La fecha del sorteo es requerida");
-        }
-        
-        const drawDate = new Date(input.drawDate);
-        if (isNaN(drawDate.getTime())) {
-          throw new Error("Formato de fecha inválido");
-        }
-        
-        return createRaffle({
-          title: input.title,
-          description: input.description,
-          image: input.image,
-          totalTickets: input.totalTickets,
-          pricePerTicket: Math.round(input.pricePerTicket * 100),
-          drawDate: drawDate,
-          webhookUrl: input.webhookUrl,
-          category: input.category,
-          raffleNumber: input.raffleNumber,
-          isActive: true,
-        });
+        return createRaffle(input);
       }),
 
     update: publicProcedure
       .input(z.object({
         id: z.number(),
-        title: z.string().optional(),
-        description: z.string().optional(),
-        image: z.string().optional(),
-        totalTickets: z.number().optional(),
-        pricePerTicket: z.number().optional(),
-        drawDate: z.string().optional(),
-        webhookUrl: z.string().optional(),
-        category: z.enum(["dinero", "electronica", "herramientas", "kpop", "moda", "otro"]).optional(),
+        data: z.any(),
       }))
       .mutation(async ({ input }) => {
-        const { id, ...data } = input;
-        const updateData: any = {};
-        if (data.title) updateData.title = data.title;
-        if (data.description) updateData.description = data.description;
-        if (data.image) updateData.image = data.image;
-        if (data.totalTickets) updateData.totalTickets = data.totalTickets;
-        if (data.pricePerTicket) updateData.pricePerTicket = Math.round(data.pricePerTicket * 100);
-        if (data.drawDate) updateData.drawDate = new Date(data.drawDate);
-        if (data.webhookUrl) updateData.webhookUrl = data.webhookUrl;
-        if (data.category) updateData.category = data.category;
-        return updateRaffle(id, updateData);
+        return updateRaffle(input.id, input.data);
       }),
 
     delete: publicProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         return deleteRaffle(input.id);
-      }),
-
-    createCheckout: publicProcedure
-      .input(z.object({
-        raffleId: z.number(),
-        ticketNumbers: z.array(z.string()),
-        totalAmount: z.number(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        const raffle = await getRaffleById(input.raffleId);
-        if (!raffle) throw new Error("Rifa no encontrada");
-
-        const session = await stripe.checkout.sessions.create({
-          line_items: [
-            {
-              price_data: {
-                currency: "mxn",
-                product_data: {
-                  name: raffle.title,
-                  description: `${input.ticketNumbers.length} boletos para ${raffle.title}`,
-                },
-                unit_amount: raffle.pricePerTicket,
-              },
-              quantity: input.ticketNumbers.length,
-            },
-          ],
-          mode: "payment",
-          success_url: `${ctx.req.headers.origin || "http://localhost:3000"}/rifa/${input.raffleId}?success=true`,
-          cancel_url: `${ctx.req.headers.origin || "http://localhost:3000"}/rifa/${input.raffleId}?cancelled=true`,
-          customer_email: ctx.user?.email || undefined,
-          metadata: {
-            raffleId: input.raffleId.toString(),
-            ticketNumbers: input.ticketNumbers.join(","),
-            userId: ctx.user?.id.toString() || "guest",
-          },
-        } as any);
-
-        return {
-          checkoutUrl: session.url,
-          sessionId: session.id,
-        };
       }),
   }),
 });

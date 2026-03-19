@@ -98,9 +98,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     email: order.buyerEmail
   });
 
+  // Extract buyer info from Stripe session if not in order
+  const buyerName = session.customer_details?.name || order.buyerName;
+  const buyerEmail = session.customer_details?.email || order.buyerEmail;
+  const buyerPhone = session.customer_details?.phone || order.buyerPhone;
+
+  console.log(`[Webhook] Final buyer info for tickets:`, { buyerName, buyerEmail, buyerPhone });
+
   // Mark tickets as sold with buyer information
   const ticketNumbers = JSON.parse(order.ticketNumbers) as string[];
-  await markTicketsSold(order.id, ticketNumbers, order.buyerName, order.buyerPhone, order.buyerEmail);
+  await markTicketsSold(order.id, ticketNumbers, buyerName, buyerPhone, buyerEmail);
 
   // Sync to Google Sheets
   try {

@@ -26,7 +26,7 @@ function getStripe(): Stripe {
   return stripe;
 }
 
-const webhookRouter = Router();
+export const webhookRouter = Router();
 
 // MUST use raw body for Stripe signature verification
 // Dynamic raffle webhook endpoint
@@ -135,4 +135,4 @@ async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
   }
 }
 
-export default webhookRouter;
+// export default webhookRouter;

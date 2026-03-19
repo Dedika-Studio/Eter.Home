@@ -188,6 +188,55 @@ export const appRouter = router({
           createdAt: order.createdAt,
         };
       }),
+    
+        confirmPayment: publicProcedure
+      .input(z.object({
+        orderId: z.number(),
+        sessionId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const order = await getOrderById(input.orderId);
+        if (!order) throw new Error("Orden no encontrada");
+        
+        if (order.status === "paid") {
+          console.log(`[Confirm Payment] Order ${order.id} already paid, skipping`);
+          return { success: true, message: "Order already confirmed" };
+        }
+
+        try {
+          // Retrieve the session from Stripe to verify payment
+          const session = await stripe.checkout.sessions.retrieve(input.sessionId);
+          
+          if (session.payment_status !== "paid") {
+            throw new Error("Payment not completed");
+          }
+
+          // Update order status to paid
+          await updateOrderStatus(order.id, "paid", session.payment_intent as string);
+
+          // Mark tickets as sold with buyer information
+          await markTicketsSold(order.id, order.buyerName, order.buyerPhone, order.buyerEmail);
+
+          // Send WhatsApp confirmation if phone is available
+          if (order.buyerPhone) {
+            const ticketNumbers = JSON.parse(order.ticketNumbers) as string[];
+            const whatsappPhone = `+52${order.buyerPhone}`;
+            await sendWhatsAppConfirmation({
+              to: whatsappPhone,
+              ticketNumbers,
+              buyerName: order.buyerName,
+              totalAmount: order.totalAmount,
+            }).catch(err => console.error("[WhatsApp] Failed to send confirmation:", err));
+          }
+
+          console.log(`[Confirm Payment] Order ${order.id} confirmed. Tickets marked as sold.`);
+          return { success: true, message: "Payment confirmed and tickets registered" };
+        } catch (error) {
+          console.error("[Confirm Payment] Error confirming payment:", error);
+          throw new Error("Error confirming payment");
+        }
+      }),
+
   }),
 
   raffles: router({

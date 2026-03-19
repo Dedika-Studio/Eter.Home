@@ -17,12 +17,15 @@ import Raffles from "./pages/Raffles";
 import Galleries from "./pages/Galleries";
 import Biographies from "./pages/Biographies";
 import PurchaseHistory from "./pages/PurchaseHistory";
+import { NewsPage } from "./pages/News";
+
 
 function Router() {
   // Routing: / = Landing Home, /rifa = Raffle
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
+      <Route path="/noticias" component={NewsPage} />
       <Route path="/" component={LandingHome} />
       <Route path="/rifa" component={Home} />
       <Route path="/rifa/:raffleNumber" component={RaffleDetail} />

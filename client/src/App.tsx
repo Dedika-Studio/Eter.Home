@@ -25,7 +25,6 @@ function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path="/noticias" component={NewsPage} />
       <Route path="/" component={LandingHome} />
       <Route path="/rifa" component={Home} />
       <Route path="/rifa/:raffleNumber" component={RaffleDetail} />
@@ -47,6 +46,7 @@ function Router() {
       <Route path="/galerias" component={Galleries} />
       <Route path="/biografias" component={Biographies} />
       <Route path="/mi-historial" component={PurchaseHistory} />
+      <Route path="/noticias" component={NewsPage} />
       <Route path="/admin" component={Admin} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}

@@ -10,10 +10,21 @@ import { syncToGoogleSheets } from "./sheets-sync";
 import { sendWhatsAppConfirmation } from "./whatsapp";
 
 // Use LIVE keys if available, fallback to test keys
-const stripeSecretKey = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || "";
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2025-02-24.acacia" as any,
-});
+// Initialize Stripe lazily to ensure env vars are loaded
+let stripe: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripe) {
+    const stripeSecretKey = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      throw new Error('STRIPE_SECRET_KEY or STRIPE_LIVE_SECRET_KEY environment variable is required');
+    }
+    stripe = new Stripe(stripeSecretKey, {
+      apiVersion: "2025-02-24.acacia" as any,
+    });
+  }
+  return stripe;
+}
 
 const webhookRouter = Router();
 
@@ -30,7 +41,7 @@ webhookRouter.post(
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
+      event = getStripe().webhooks.constructEvent(req.body, sig as string, webhookSecret);
     } catch (err: any) {
       console.error(`[Webhook Raffle ${raffleId}] Signature verification failed:`, err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -78,7 +89,7 @@ webhookRouter.post(
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
+      event = getStripe().webhooks.constructEvent(req.body, sig as string, webhookSecret);
     } catch (err: any) {
       console.error("[Webhook] Signature verification failed:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);

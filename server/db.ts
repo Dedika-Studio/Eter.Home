@@ -112,9 +112,23 @@ export async function markTicketsSold(orderId: number, ticketNumbers: string[], 
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const now = Date.now();
-  await db.update(tickets)
-    .set({ status: "sold", buyerName, buyerPhone, buyerEmail, soldAt: now })
+  console.log(`[DB] Marking tickets as sold for order ${orderId}:`, {
+    ticketNumbers,
+    buyerName,
+    buyerPhone,
+    buyerEmail,
+    now
+  });
+  const result = await db.update(tickets)
+    .set({ 
+      status: "sold", 
+      buyerName: buyerName || null, 
+      buyerPhone: buyerPhone || null, 
+      buyerEmail: buyerEmail || null, 
+      soldAt: now 
+    })
     .where(inArray(tickets.number, ticketNumbers));
+  console.log(`[DB] Update result for order ${orderId}:`, result);
 }
 
 export async function releaseExpiredReservations() {

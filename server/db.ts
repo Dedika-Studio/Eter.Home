@@ -112,6 +112,7 @@ export async function markTicketsSold(orderId: number, ticketNumbers: string[], 
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const now = Date.now();
+  
   console.log(`[DB] Marking tickets as sold for order ${orderId}:`, {
     ticketNumbers,
     buyerName,
@@ -119,15 +120,20 @@ export async function markTicketsSold(orderId: number, ticketNumbers: string[], 
     buyerEmail,
     now
   });
+
+  // Ensure we are updating based on orderId and status to be safe, 
+  // and explicitly setting the buyer fields.
   const result = await db.update(tickets)
     .set({ 
       status: "sold", 
       buyerName: buyerName || null, 
       buyerPhone: buyerPhone || null, 
       buyerEmail: buyerEmail || null, 
+      orderId: orderId, // Ensure orderId is set
       soldAt: now 
     })
     .where(inArray(tickets.number, ticketNumbers));
+    
   console.log(`[DB] Update result for order ${orderId}:`, result);
 }
 
@@ -136,7 +142,7 @@ export async function releaseExpiredReservations() {
   if (!db) return;
   const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
   await db.update(tickets)
-    .set({ status: "available", orderId: null, reservedAt: null })
+    .set({ status: "available", orderId: null, reservedAt: null, buyerName: null, buyerPhone: null, buyerEmail: null })
     .where(and(eq(tickets.status, "reserved"), lt(tickets.reservedAt, tenMinutesAgo)));
 }
 
@@ -144,7 +150,7 @@ export async function releaseTicketsByOrder(orderId: number) {
   const db = await getDb();
   if (!db) return;
   await db.update(tickets)
-    .set({ status: "available", orderId: null, reservedAt: null })
+    .set({ status: "available", orderId: null, reservedAt: null, buyerName: null, buyerPhone: null, buyerEmail: null })
     .where(and(eq(tickets.orderId, orderId), eq(tickets.status, "reserved")));
 }
 

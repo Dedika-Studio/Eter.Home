@@ -38,8 +38,8 @@ import { eq } from "drizzle-orm";
 
 import { sendWhatsAppConfirmation } from "./whatsapp";
 
-// Use LIVE keys if available, fallback to test keys
-const stripeSecretKey = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || "";
+// Use TEST keys as requested
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "";
 const stripe = new Stripe(stripeSecretKey, {
   apiVersion: "2025-02-24.acacia" as any,
 });
@@ -144,7 +144,8 @@ export const appRouter = router({
               },
             ],
             mode: "payment",
-            success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+            // Include order_id in success_url for manual confirmation backup
+            success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
             cancel_url: `${origin}/cancel?order_id=${orderId}`,
             client_reference_id: orderId.toString(),
             customer_email: input.buyerEmail || undefined,
@@ -212,7 +213,7 @@ export const appRouter = router({
         // Update order status to paid
         await updateOrderStatus(order.id, "paid", session.payment_intent as string);
 
-        // Mark tickets as sold with buyer information
+        // Mark tickets as sold with buyer information from the order
         const ticketNumbers = JSON.parse(order.ticketNumbers) as string[];
         await markTicketsSold(order.id, ticketNumbers, order.buyerName, order.buyerPhone, order.buyerEmail);
 
@@ -228,7 +229,7 @@ export const appRouter = router({
           }).catch(err => console.error("[WhatsApp] Failed to send confirmation:", err));
         }
 
-        console.log(`[Confirm Payment] Order ${order.id} confirmed. Tickets marked as sold.`);
+        console.log(`[Confirm Payment] Order ${order.id} confirmed manually. Tickets marked as sold.`);
         return { success: true, message: "Payment confirmed and tickets registered" };
       })
   }),
